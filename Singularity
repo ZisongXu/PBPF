@@ -3,7 +3,7 @@ From:ubuntu:20.04
 
 %labels
 
-AUTHOR Rafael Papallas (rpapallas.com)
+AUTHOR Zisong XU (xzs1210652636@gmail.com)
 
 %environment
     export LANG=C.UTF-8
