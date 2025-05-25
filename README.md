@@ -33,8 +33,8 @@ We recommend using the Singularity container provided in our codebase (see the [
 2. **Build and Run Container**
 
 	```
-	cd ~/.../PBPF
-	./build.sh # will take some time to build
+	cd ~/the_folder_where_you_cloned_the_repo/PBPF
+	./build.sh
 	./run.sh
 	```
 
