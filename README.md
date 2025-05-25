@@ -26,7 +26,9 @@ We recommend using the Singularity container provided in our codebase (see the [
 
 1. **Download Code**
 
+	```python
 	git clone --recurse git@github.com:ZisongXu/PBPF.git
+	```
 
 2. **Build Container**
 
