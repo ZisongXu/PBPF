@@ -40,7 +40,7 @@ We recommend using the Singularity container provided in our codebase (see the [
 
 3. **Download Rosbags** (For running demos only)
 	
-	Download [the rosbags](https://leeds365-my.sharepoint.com/:f:/g/personal/scsmrd_leeds_ac_uk/Ej3ecEm8XFdDud6IfLTSw_sBTkiq29Wiul8XWYB9Xhzaug?e=Rpj9qy) and save them to the ```rosbag``` folder, i.e., ```~/rosbag/```.
+	Download [the rosbags](https://leeds365-my.sharepoint.com/:f:/g/personal/scsmrd_leeds_ac_uk/Ej3ecEm8XFdDud6IfLTSw_sBTkiq29Wiul8XWYB9Xhzaug?e=Rpj9qy) (approximately 2.6TB).
 
 
 # Running Code
