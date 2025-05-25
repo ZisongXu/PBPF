@@ -30,11 +30,12 @@ We recommend using the Singularity container provided in our codebase (see the [
 	git clone --recurse git@github.com:ZisongXu/PBPF.git
 	```
 
-2. **Build Container**
+2. **Build and Run Container**
 
 	```python
 	cd ~/.../PBPF
-	./build.sh
+	./build.sh # will take some time to build
+	./run.sh
 	```
 
 	Please enter into the main folder and run ```./build.sh``` in Ubuntu20 terminal to build the container.
