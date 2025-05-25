@@ -38,11 +38,9 @@ We recommend using the Singularity container provided in our codebase (see the [
 	./run.sh
 	```
 
-	Please enter into the main folder and run ```./build.sh``` in Ubuntu20 terminal to build the container.
-
 3. **Download Rosbags** (For running demos only)
 	
-	Download [the rosbags](https://drive.google.com/drive/folders/13EbCuu231izDbmrcIeyjeQlJSPJL1qWW?usp=sharing) and save them to the ```rosbag``` folder, i.e., ```~/rosbag/```.
+	Download [the rosbags](https://leeds365-my.sharepoint.com/:f:/g/personal/scsmrd_leeds_ac_uk/Ej3ecEm8XFdDud6IfLTSw_sBTkiq29Wiul8XWYB9Xhzaug?e=Rpj9qy) and save them to the ```rosbag``` folder, i.e., ```~/rosbag/```.
 
 
 # Running Code
