@@ -19,16 +19,25 @@ Click to watch the video.
 We propose a method to track the pose of an object over time, by using the image from the camera, and the particles in the physical engine. Although sometimes the camera cannot see the object clearly, our method can still track the pose of the object. -->
 
 
-# Quick Setup:
+# Quick Setup and Installation:
 
 We recommend using the Singularity container provided in our codebase (see the [Singularity installation guide](https://docs.sylabs.io/guides/3.0/user-guide/index.html)) to run the PBPF algorithm.
 
 
-1. **Build Container** (This project uses singularity container to support all the code)
+1. **Download Code**
+
+	git clone --recurse git@github.com:ZisongXu/PBPF.git
+
+2. **Build Container**
+
+	```python
+	cd ~/.../PBPF
+	./build.sh
+	```
 
 	Please enter into the main folder and run ```./build.sh``` in Ubuntu20 terminal to build the container.
 
-2. **Download Rosbags** (For running demos only)
+3. **Download Rosbags** (For running demos only)
 	
 	Download [the rosbags](https://drive.google.com/drive/folders/13EbCuu231izDbmrcIeyjeQlJSPJL1qWW?usp=sharing) and save them to the ```rosbag``` folder, i.e., ```~/rosbag/```.
 
