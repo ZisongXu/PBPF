@@ -27,9 +27,7 @@ object_name_list:
 - cracker
 - Parmesan
 - soup
-- Mayo
-- SaladDressing
-object_num: 5
+object_num: 3
 objs_are_not_touching_target_objs_num: 0
 objs_touching_target_objs_num: 0
 optitrack_flag: true
