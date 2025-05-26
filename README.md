@@ -7,7 +7,7 @@
 [[Data]](https://leeds365-my.sharepoint.com/:f:/g/personal/scsmrd_leeds_ac_uk/Ej3ecEm8XFdDud6IfLTSw_sBTkiq29Wiul8XWYB9Xhzaug?e=Rpj9qy)
 
 [Zisong Xu](https://github.com/ZisongXu)<sup>1</sup>,
-[Rafael Papallas](https://github.com/rpapallas)<sup>1, 2</sup>,
+[Rafael Papallas](https://rpapallas.com)<sup>1, 2</sup>,
 [Jaina Modisett](https://github.com/citrus-tree)<sup>1</sup>,
 [Markus Billeter](https://github.com/billeter)<sup>1</sup>,
 [Mehmet R. Dogar](https://github.com/mdogar)<sup>1</sup>
