@@ -208,19 +208,22 @@ The above steps cover the entire process of running the code, but to ensure it r
 [PBPF] Singularity> ~/pyvkdepth/assets-src/meshes $ zstd object.obj -o object.obj.zst
 ```
 4. Add the following code to the `./PBPF/home/pyvkdepth/tests/bake.py` script to generate files for rendering,
-```python
-bake_obj(
-    "assets/meshes/object.vkdepthmesh",
-    "assets-src/meshes/object.obj.zst"
-);
-bake_obj(
-    "assets/meshes/object-red.vkdepthmesh",
-    "assets-src/meshes/object.obj.zst",
-    aSimplifyTarget = 0.1, aSimplifyMaxErr = 0.01
-);
-```
-
-		then you can find `object.vkdepthmesh` and `object-red.vkdepthmesh` files under the `./PBPF/home/pyvkdepth/assets/meshes` folder.
+	```python
+	bake_obj(
+		"assets/meshes/object.vkdepthmesh",
+		"assets-src/meshes/object.obj.zst"
+	);
+	bake_obj(
+		"assets/meshes/object-red.vkdepthmesh",
+		"assets-src/meshes/object.obj.zst",
+		aSimplifyTarget = 0.1, aSimplifyMaxErr = 0.01
+	);
+	```
+	then run
+	```bash
+	[PBPF] Singularity> ~/pyvkdepth/assets-src/meshes $ ./tests/bake.py 
+	```
+	then you can find `object.vkdepthmesh` and `object-red.vkdepthmesh` files under the `./PBPF/home/pyvkdepth/assets/meshes` folder.
 
 5. Create the model related to `object` based on `object.obj` and `object.mtl`, and place it in the `./PBPF/home/project/object` folder. You can find corresponding examples in this folder.
 
