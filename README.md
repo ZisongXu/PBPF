@@ -237,6 +237,9 @@ The above steps cover the entire process of running the code, but to ensure it r
 	object_num: 3
 	```
 
+7. Need to ensure that the names of the new objects are consistent.
+
+
 ## 🏞️ Change the Experimental Environment
 
 
