@@ -45,8 +45,11 @@ We recommend using the Singularity container provided in our codebase (see the [
 	git clone --recurse git@github.com:billeter/pyvkdepth.git
 	```
 
+4. **Prepare Scripts**
 
-4. **Download Rosbags** (For running demos only)
+	Move the files from the `sh_scripts` folder in rep's `home` directory to the `pyvkdepth` folder in the `home` directory.
+
+5. **Download Rosbags** (For running demos only)
 	
 	Download [the rosbags](https://leeds365-my.sharepoint.com/:f:/g/personal/scsmrd_leeds_ac_uk/Ej3ecEm8XFdDud6IfLTSw_sBTkiq29Wiul8XWYB9Xhzaug?e=Rpj9qy) (approximate 2.6TB).
 
