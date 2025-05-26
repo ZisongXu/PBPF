@@ -213,6 +213,11 @@ bake_obj(
     "assets/meshes/object.vkdepthmesh",
     "assets-src/meshes/object.obj.zst"
 );
+bake_obj(
+    "assets/meshes/object-red.vkdepthmesh",
+    "assets-src/meshes/object.obj.zst",
+    aSimplifyTarget = 0.1, aSimplifyMaxErr = 0.01
+);
 ```
 
 
