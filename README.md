@@ -1,5 +1,29 @@
 # 🏔️ Physics Based Particle Filtering (PBPF)
 
+
+
+[[Project page]]()
+[[Paper]]()
+[[Data]](https://leeds365-my.sharepoint.com/:f:/g/personal/scsmrd_leeds_ac_uk/Ej3ecEm8XFdDud6IfLTSw_sBTkiq29Wiul8XWYB9Xhzaug?e=Rpj9qy)
+[[Colab (state)]](https://colab.research.google.com/drive/1gxdkgRVfM55zihY9TFLja97cSVZOZq2B?usp=sharing)
+[[Colab (vision)]](https://colab.research.google.com/drive/18GIHeOQ5DyjMN8iIRZL2EKZ0745NLIpg?usp=sharing)
+
+
+[Cheng Chi](http://cheng-chi.github.io/)<sup>1</sup>,
+[Siyuan Feng](https://www.cs.cmu.edu/~sfeng/)<sup>2</sup>,
+[Yilun Du](https://yilundu.github.io/)<sup>3</sup>,
+[Zhenjia Xu](https://www.zhenjiaxu.com/)<sup>1</sup>,
+[Eric Cousineau](https://www.eacousineau.com/)<sup>2</sup>,
+[Benjamin Burchfiel](http://www.benburchfiel.com/)<sup>2</sup>,
+[Shuran Song](https://www.cs.columbia.edu/~shurans/)<sup>1</sup>
+
+<sup>1</sup>Columbia University,
+<sup>2</sup>Toyota Research Institute,
+<sup>3</sup>MIT
+
+---
+
+
 This is the official implementation of the paper "Tracking and Control of Multiple Objects during Non-Prehensile Manipulation in Clutter".
 
 **Abstract:** We propose a method for 6D pose tracking and control of multiple objects during non-prehensile manipulation by a robot. The tracking system estimates objects' poses by integrating physics predictions, derived from robotic joint state information, with visual inputs from an RGB-D camera. Specifically, the methodology is based on particle filtering, which fuses control information from the robot as an input for each particle movement and with real-time camera observations to track the pose of objects. Comparative analyses reveal that this physics-based approach substantially improves pose tracking accuracy over baseline methods that rely solely on visual data, particularly during manipulation in clutter, where occlusions are a frequent problem. The tracking system is integrated with a model predictive control approach which shows that the probabilistic nature of our tracking system can help robust manipulation planning and control of multiple objects in clutter, even under heavy occlusions.
@@ -97,7 +121,7 @@ We recommend using the Singularity container provided in our codebase (see the [
 
 5. **Download Rosbags** (For running demos only)
 	
-	Download [the rosbags](https://leeds365-my.sharepoint.com/:f:/g/personal/scsmrd_leeds_ac_uk/Ej3ecEm8XFdDud6IfLTSw_sBTkiq29Wiul8XWYB9Xhzaug?e=Rpj9qy) (approximate 2.6TB). If you can not access the URL, please contact us (xzs1210652636@gmail.com/M.R.Dogar@leeds.ac.uk)
+	Download the [rosbags](https://leeds365-my.sharepoint.com/:f:/g/personal/scsmrd_leeds_ac_uk/Ej3ecEm8XFdDud6IfLTSw_sBTkiq29Wiul8XWYB9Xhzaug?e=Rpj9qy) (approximate 2.6TB). If you can not access the URL, please contact us (xzs1210652636@gmail.com/M.R.Dogar@leeds.ac.uk)
 
 
 # Running Code
