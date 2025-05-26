@@ -32,10 +32,12 @@ We recommend using the Singularity container provided in our codebase (see the [
 
 2. **Build and Run Container**
 
-	```
-	cd ~/the_folder_where_you_cloned_the_repo/PBPF
-	./build.sh
-	./run.sh
+	```bash
+	user@pcName:~/<repo_dir>$ cd PBPF
+	user@pcName:~/<repo_dir>/PBPF$ ./build.sh
+	user@pcName:~/<repo_dir>/PBPF$ ./run.sh
+	[PBPF] Singularity> ~/catkin_ws $ cd ~
+	[PBPF] Singularity> ~ $ 
 	```
 
 3. **Download Rendering Code**
