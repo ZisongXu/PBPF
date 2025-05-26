@@ -27,7 +27,7 @@ We recommend using the Singularity container provided in our codebase (see the [
 1. **Download Code**
 
 	```bash
-	user@pcName:~/the_folder_where_you_cloned_the_repo$ git clone --recurse git@github.com:ZisongXu/PBPF.git
+	user@pcName:~/<repo_dir>$ git clone --recurse git@github.com:ZisongXu/PBPF.git
 	```
 
 2. **Build and Run Container**
