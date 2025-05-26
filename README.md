@@ -49,6 +49,7 @@ We recommend using the Singularity container provided in our codebase (see the [
 
 	Move the files from the `sh_scripts` folder in repo's `home` directory to the `pyvkdepth` folder in the `home` directory.
 
+	Origianl directory:
 
 	```text
 	MyProject/
@@ -61,7 +62,27 @@ We recommend using the Singularity container provided in our codebase (see the [
 	│   └── deploy.sh
 	└── README.md
 	```
-
+	```
+	.
+	├── config.yaml
+	├── metrics
+	│   └── logs.json.txt
+	├── train_0
+	│   ├── checkpoints
+	│   │   ├── epoch=0300-test_mean_score=1.000.ckpt
+	│   │   └── latest.ckpt
+	│   └── logs.json.txt
+	├── train_1
+	│   ├── checkpoints
+	│   │   ├── epoch=0250-test_mean_score=1.000.ckpt
+	│   │   └── latest.ckpt
+	│   └── logs.json.txt
+	└── train_2
+		├── checkpoints
+		│   ├── epoch=0250-test_mean_score=1.000.ckpt
+		│   └── latest.ckpt
+		└── logs.json.txt
+	```
 
 
 5. **Download Rosbags** (For running demos only)
