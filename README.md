@@ -43,7 +43,7 @@ We propose a method to track the pose of an object over time, by using the image
 
 <br>
 
-# 🛠️ Experimental Environment Configuration and Installation:
+# 🛠️ Runtime Environment Configuration and Installation:
 
 We recommend using the Singularity container provided in our codebase (see the [Singularity installation guide](https://docs.sylabs.io/guides/3.0/user-guide/index.html)) to run the PBPF algorithm.
 
