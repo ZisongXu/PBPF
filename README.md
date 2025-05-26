@@ -46,7 +46,7 @@ We recommend using the Singularity container provided in our codebase (see the [
 
 
 
-3. **Download Rendering Code**
+3. **Download and Setup Rendering Code**
 
 	```bash
 	user@pcName:~/<repo_dir>/PBPF$ cd home
