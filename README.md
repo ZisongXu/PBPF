@@ -65,6 +65,22 @@ We recommend using the Singularity container provided in our codebase (see the [
 	└── .local
 	```
 
+	**New directory:**
+
+	```
+	./PBPF/home
+	├── catkin_ws
+	├── project
+	├── pyvkdepth
+	│   ├ ...
+	│   ├── automated_experiments.sh
+	│   ├── get_info_from_rosbag.py
+	│   └── update_yaml_file_automated.py
+	├── sh_scripts # empty
+	├── .bashrc
+	├── .cache
+	└── .local
+	```
 
 5. **Download Rosbags** (For running demos only)
 	
