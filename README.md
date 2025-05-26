@@ -49,28 +49,20 @@ We recommend using the Singularity container provided in our codebase (see the [
 
 	Move the files from the `sh_scripts` folder in repo's `home` directory to the `pyvkdepth` folder in the `home` directory.
 
-	Origianl directory:
+	**Origianl directory:**
 
 	```
-	.
-	├── config.yaml
-	├── metrics
-	│   └── logs.json.txt
-	├── train_0
-	│   ├── checkpoints
-	│   │   ├── epoch=0300-test_mean_score=1.000.ckpt
-	│   │   └── latest.ckpt
-	│   └── logs.json.txt
-	├── train_1
-	│   ├── checkpoints
-	│   │   ├── epoch=0250-test_mean_score=1.000.ckpt
-	│   │   └── latest.ckpt
-	│   └── logs.json.txt
-	└── train_2
-		├── checkpoints
-		│   ├── epoch=0250-test_mean_score=1.000.ckpt
-		│   └── latest.ckpt
-		└── logs.json.txt
+	./PBPF/home
+	├── catkin_ws
+	├── project
+	├── pyvkdepth
+	├── sh_scripts
+	│   ├── automated_experiments.sh
+	│	├── get_info_from_rosbag.py
+	│	└── update_yaml_file_automated.py
+	├── .bashrc
+	├── .cache
+	└── .local
 	```
 
 
