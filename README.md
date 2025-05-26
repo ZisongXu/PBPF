@@ -47,7 +47,7 @@ We recommend using the Singularity container provided in our codebase (see the [
 
 4. **Prepare Scripts**
 
-	Move the files from the `sh_scripts` folder in rep's `home` directory to the `pyvkdepth` folder in the `home` directory.
+	Move the files from the `sh_scripts` folder in repo's `home` directory to the `pyvkdepth` folder in the `home` directory.
 
 5. **Download Rosbags** (For running demos only)
 	
