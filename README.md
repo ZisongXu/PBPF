@@ -205,7 +205,7 @@ The above steps cover the entire process of running the code, but to ensure it r
 2. Put them into the `./PBPF/home/pyvkdepth/assets-src/meshes/` folder. We have provided meshes of some objects, you can find them under the `./PBPF/home/project/meshes_for_render` folder, and move them to the `./PBPF/home/pyvkdepth/assets-src/meshes/` folder.
 3. Compress the `.obj` file into a `.obj.zst` file:
 ```bash
-[PBPF] Singularity> ~/pyvkdepth/assets-src/mesher $ zstd object.obj -o object.obj.zst
+[PBPF] Singularity> ~/pyvkdepth/assets-src/meshes $ zstd object.obj -o object.obj.zst
 ```
 4. Add the following code to the `./PBPF/home/pyvkdepth/tests/bake.py` script to generate files for rendering: 
 ```python
