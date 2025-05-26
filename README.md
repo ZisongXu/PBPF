@@ -154,7 +154,10 @@ We recommend using the Singularity container provided in our codebase (see the [
 	
 5. **Visualization Window**
 
-	```$ rosrun PBPF Visualisation_World_Particle.py```
+	```bash
+	user@pcName:~/<repo_dir>/PBPF$ ./run.sh
+	[PBPF] Singularity> ~ $ rosrun PBPF Visualisation_World_Particle.py
+	```
 	
 
 	
