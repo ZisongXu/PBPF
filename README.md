@@ -228,10 +228,18 @@ The above steps cover the entire process of running the code, but to ensure it r
 
 5. Create the model related to `object` based on `object.obj` and `object.mtl`, and place it in the `./PBPF/home/project/object` folder. You can find corresponding examples in this folder.
 
+6. Modify the object_name_list and object_num parameters in the `./PBPF/home/catkin_ws/src/PBPF/config/parameter_info.yaml`. Assign the names of the new objects to `object_name_list`, and assign the number of new objects to `object_num`. For example:
+	```bash
+	object_name_list:
+	- cracker
+	- Parmesan
+	- soup
+	object_num: 3
+	```
 
 
 
-
+<!-- ## 📦 Add New Objects -->
 
 
 
