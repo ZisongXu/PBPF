@@ -39,7 +39,7 @@ We recommend using the Singularity container provided in our codebase (see the [
 	[PBPF] Singularity> ~/catkin_ws $ cd ~
 	[PBPF] Singularity> ~ $ 
 	```
-	```{Note}
+	```{note}
 	dsdsf
 	```
 
