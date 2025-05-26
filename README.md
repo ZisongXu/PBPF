@@ -201,11 +201,19 @@ The above steps cover the entire process of running the code, but to ensure it r
 
 ## 🧑‍🍳 Bake New Objects
 
-1. Prepare `object.mtl` and `object.obj` (you can also prepare the `object.png` to illustrate textures, not necessarily). 
+1. Prepare the `object.obj` of new object (you can also prepare the `object.mtl` and `object.png` to illustrate textures, not necessarily). 
 2. Put them into the `./PBPF/home/pyvkdepth/assets-src/meshes/` folder. We have provided meshes of some objects, you can find them under the `./PBPF/home/project/meshes_for_render` folder, and move them to the `./PBPF/home/pyvkdepth/assets-src/meshes/` folder.
-
-
-
+3. Compress the `.obj` file into a `.obj.zst` file:
+```bash
+[PBPF] Singularity> ~/pyvkdepth/assets-src/mesher $ zstd object.obj -o object.obj.zst
+```
+4. Add the following code to the `./PBPF/home/pyvkdepth/tests/bake.py` script to generate files for rendering: 
+```python
+bake_obj(
+    "assets/meshes/object.vkdepthmesh",
+    "assets-src/meshes/object.obj.zst"
+);
+```
 
 
 
