@@ -220,7 +220,7 @@ bake_obj(
 );
 ```
 
-	then you can find `object.vkdepthmesh` and `object-red.vkdepthmesh` files under the `./PBPF/home/pyvkdepth/assets/meshes` folder.
+		then you can find `object.vkdepthmesh` and `object-red.vkdepthmesh` files under the `./PBPF/home/pyvkdepth/assets/meshes` folder.
 
 5. Create the model related to `object` based on `object.obj` and `object.mtl`, and place it in the `./PBPF/home/project/object` folder. You can find corresponding examples in this folder.
 
