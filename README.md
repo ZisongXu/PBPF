@@ -116,10 +116,10 @@ We recommend using the Singularity container provided in our codebase (see the [
 5. **Download Rosbags** (For running demos only)
 	
 	```bash
-	[PBPF] Singularity> ~/pyvkdepth $ mkdir rosbags
+	[PBPF] Singularity> ~/pyvkdepth $ mkdir rosbag
 	```
 
-	Download the [rosbags](https://leeds365-my.sharepoint.com/:f:/g/personal/scsmrd_leeds_ac_uk/Ej3ecEm8XFdDud6IfLTSw_sBTkiq29Wiul8XWYB9Xhzaug?e=Rpj9qy) (approximate 2.6TB). If you can not access the URL, please contact us (xzs1210652636@gmail.com/M.R.Dogar@leeds.ac.uk). Put the rosbags into the `./PBPF/home/pyvkdepth/rosbags` folder.
+	Download the [rosbags](https://leeds365-my.sharepoint.com/:f:/g/personal/scsmrd_leeds_ac_uk/Ej3ecEm8XFdDud6IfLTSw_sBTkiq29Wiul8XWYB9Xhzaug?e=Rpj9qy) (approximate 2.6TB). If you can not access the URL, please contact us (xzs1210652636@gmail.com/M.R.Dogar@leeds.ac.uk). Put the rosbags into the `./PBPF/home/pyvkdepth/rosbag` folder.
 
 # Running Code
 1. **Start Container**
