@@ -55,9 +55,7 @@ We recommend using the Singularity container provided in our codebase (see the [
 	user@pcName:~/<repo_dir>/PBPF$ ./run.sh
 	[PBPF] Singularity> ~ $ cd pyvkdepth
 	[PBPF] Singularity> ~/pyvkdepth $ ./premake5 gmake2
-	[PBPF] Singularity> ~/pyvkdepth $ make -j8
-	or
-	[PBPF] Singularity> ~/pyvkdepth $ make -j8 config=release_x64
+	[PBPF] Singularity> ~/pyvkdepth $ make -j8 or [PBPF] Singularity> ~/pyvkdepth $ make -j8 config=release_x64
 	```
 
 4. **Prepare Scripts**
