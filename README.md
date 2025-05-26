@@ -19,7 +19,7 @@ Click to watch the video.
 We propose a method to track the pose of an object over time, by using the image from the camera, and the particles in the physical engine. Although sometimes the camera cannot see the object clearly, our method can still track the pose of the object. -->
 
 
-# Quick Setup and Installation:
+# 🛠️Quick Setup and Installation:
 
 We recommend using the Singularity container provided in our codebase (see the [Singularity installation guide](https://docs.sylabs.io/guides/3.0/user-guide/index.html)) to run the PBPF algorithm.
 
@@ -51,17 +51,6 @@ We recommend using the Singularity container provided in our codebase (see the [
 
 	Origianl directory:
 
-	```text
-	MyProject/
-	├── src/            
-	│   └── main.py
-	├── configs/        
-	│   ├── base.yaml
-	│   └── dev.yaml
-	├── scripts/        
-	│   └── deploy.sh
-	└── README.md
-	```
 	```
 	.
 	├── config.yaml
