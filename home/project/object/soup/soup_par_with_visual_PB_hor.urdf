@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+ <robot name="object">
+   <material name="light_green">
+     <color rgba="0 1 0.498 1"/>
+   </material>
+   <material name="coral">
+     <color rgba="1 0.498 0.3137 1"/>
+   </material>
+   <material name="dark_red">
+     <color rgba="0.753 0.251 0.251 1"/>
+   </material>
+   <material name="white">
+     <color rgba="1 1 1 1"/>
+   </material>
+   <material name="purple">
+     <color rgba="0.68 0.55 0.90 1"/>
+   </material>
+   <link name="soup">
+     <visual>
+       <geometry>
+         <cylinder length="0.1000" radius="0.033829689025878906"/>
+         <!-- <mesh filename="textured_simple_reoriented.obj" scale="1 1 1"/> -->
+       </geometry>
+       <material name="purple"/>
+       <origin xyz="0 0 0" rpy="1.5707963 0 0"/>
+     </visual>
+     <inertial>
+       <mass value="0"/>
+       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+     </inertial>
+   </link>
+ </robot>
