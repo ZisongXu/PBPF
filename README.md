@@ -1,4 +1,4 @@
-# 🏔️ Physics Based Particle Filtering (PBPF)
+# 🏔️ Physics Based Particle Filtering (PBPF) | Easy to run!
 
 
 
@@ -135,27 +135,14 @@ We recommend using the Singularity container provided in our codebase (see the [
 	[PBPF] Singularity> ~ $ roscore
 	```
 	
-3. **Using Simulation Time** (For running demos only)
+3. **Using Simulation Time** (Only for using rosbags to run the code)
 
-	```$ rosparam set use_sim_time true```
-	
-4. **Edit Config Information** (if desired) in ```~/catkin_ws/src/PBPF/config/parameter_info.yaml```
+	```bash
+	user@pcName:~/<repo_dir>/PBPF$ ./run.sh
+	[PBPF] Singularity> ~ $ rosparam set use_sim_time true
+	```
 
-	- ```err_file```: Name of the folder where the error.csv file is saved
-	- ```gazebo_flag```: Use gazebo or not (True/False)
-	- ```object_name_list```: List of target objects names (["cracker", "soup", ...])
-	- ```object_num```: Number of target objects tracked
-	- ```other_obj_num```: Number of other objects
-	- ```oto_name_list```: List of other objects names
-	- ```otob_name_list```: List of other obstacles names
-	- ```particle_num```: Number of particles
-	- ```pick_particle_rate```: Percentage of particles selected as DOPE poses
-	- ```robot_num```: Number of robot
-	- ```run_alg_flag```: Name of algorithm (PBPF/CVPF)
-	- ```task_flag```: Name of task ('1'/'2'/'3'/'4')
-	- ```update_style_flag```: Name of the method used (time/pose)
-	- ```version```: whether to use ray tracing (old/multiray)
-	
+
 5. **Start Running** (For running demos only)
 
 	```$ ./automated_experiments.sh``` (Remember to change the directory of some files)
@@ -174,8 +161,29 @@ We recommend using the Singularity container provided in our codebase (see the [
 	
 
 
-# Data
 
-All experimental data and figures of the results are placed in the ```~/data/```. All scenes of rosbags can be downloaded through the link blow: [Rosbags for each scene of different objects](https://drive.google.com/drive/folders/13EbCuu231izDbmrcIeyjeQlJSPJL1qWW?usp=sharing)
+<!-- 	
+4. **Edit Config Information** (if desired) in ```~/catkin_ws/src/PBPF/config/parameter_info.yaml```
+
+	- ```err_file```: Name of the folder where the error.csv file is saved
+	- ```gazebo_flag```: Use gazebo or not (True/False)
+	- ```object_name_list```: List of target objects names (["cracker", "soup", ...])
+	- ```object_num```: Number of target objects tracked
+	- ```other_obj_num```: Number of other objects
+	- ```oto_name_list```: List of other objects names
+	- ```otob_name_list```: List of other obstacles names
+	- ```particle_num```: Number of particles
+	- ```pick_particle_rate```: Percentage of particles selected as DOPE poses
+	- ```robot_num```: Number of robot
+	- ```run_alg_flag```: Name of algorithm (PBPF/CVPF)
+	- ```task_flag```: Name of task ('1'/'2'/'3'/'4')
+	- ```update_style_flag```: Name of the method used (time/pose)
+	- ```version```: whether to use ray tracing (old/multiray) -->
+	
+
+
+
+
+
 
 
