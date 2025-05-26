@@ -47,7 +47,7 @@ do
 										echo "I will sleep for $duration seconds"
 								
 										# rosbag play "rosbag/1_${sceneName}_${objectName}${rosbag}.bag" --clock --rate ${slowDownRate}  > /dev/null 2>&1 & 
-										rosbag play "rosbag/3_scene3_crackersoupParmesan1.bag" --clock --rate ${slowDownRate} --start 0  > /dev/null 2>&1 & 
+										rosbag play "rosbag/3_scene2_crackersoupParmesan2.bag" --clock --rate ${slowDownRate} --start 0  > /dev/null 2>&1 & 
 
 										ROSBAGPID=$!
 
