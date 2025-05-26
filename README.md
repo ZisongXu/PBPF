@@ -58,8 +58,8 @@ We recommend using the Singularity container provided in our codebase (see the [
 	├── pyvkdepth
 	├── sh_scripts
 	│   ├── automated_experiments.sh
-	│	├── get_info_from_rosbag.py
-	│	└── update_yaml_file_automated.py
+	│   ├── get_info_from_rosbag.py
+	│   └── update_yaml_file_automated.py
 	├── .bashrc
 	├── .cache
 	└── .local
