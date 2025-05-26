@@ -12,8 +12,8 @@
 [Markus Billeter](https://github.com/billeter)<sup>1</sup>,
 [Mehmet R. Dogar](https://github.com/mdogar)<sup>1</sup>
 
-<sup>1</sup>School of Computer Science, University of Leeds,
-<sup>2</sup>Department of Computer Science, American University of Beirut - Mediterraneo
+<sup>1</sup>University of Leeds,
+<sup>2</sup>American University of Beirut - Mediterraneo
 
 ---
 
