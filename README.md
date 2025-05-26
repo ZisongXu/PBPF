@@ -40,11 +40,9 @@ We recommend using the Singularity container provided in our codebase (see the [
 	[PBPF] Singularity> ~ $ 
 	```
 	```{note}
-	dsdsf
+	Press `ctrl+D` to exit the [PBPF] container.
 	```
-	```{note} 
-      Likewise, different `MoveIt` configurations are executed here based on the specific requirements.
-      ```
+
 
 
 
