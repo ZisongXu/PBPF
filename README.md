@@ -1,10 +1,10 @@
-# 🏔️Physics Based Particle Filtering (PBPF)
+# 🏔️ Physics Based Particle Filtering (PBPF)
 
 This is the official implementation of the paper "Tracking and Control of Multiple Objects during Non-Prehensile Manipulation in Clutter".
 
 **Abstract:** We propose a method for 6D pose tracking and control of multiple objects during non-prehensile manipulation by a robot. The tracking system estimates objects' poses by integrating physics predictions, derived from robotic joint state information, with visual inputs from an RGB-D camera. Specifically, the methodology is based on particle filtering, which fuses control information from the robot as an input for each particle movement and with real-time camera observations to track the pose of objects. Comparative analyses reveal that this physics-based approach substantially improves pose tracking accuracy over baseline methods that rely solely on visual data, particularly during manipulation in clutter, where occlusions are a frequent problem. The tracking system is integrated with a model predictive control approach which shows that the probabilistic nature of our tracking system can help robust manipulation planning and control of multiple objects in clutter, even under heavy occlusions.
 
-# Supplementary Video:
+# 🎥 Supplementary Video:
 
 Click to watch the video.
 
@@ -19,7 +19,7 @@ Click to watch the video.
 We propose a method to track the pose of an object over time, by using the image from the camera, and the particles in the physical engine. Although sometimes the camera cannot see the object clearly, our method can still track the pose of the object. -->
 
 
-# 🛠️Quick Setup and Installation:
+# 🛠️ Quick Setup and Installation:
 
 We recommend using the Singularity container provided in our codebase (see the [Singularity installation guide](https://docs.sylabs.io/guides/3.0/user-guide/index.html)) to run the PBPF algorithm.
 
