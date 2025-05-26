@@ -39,10 +39,16 @@ We recommend using the Singularity container provided in our codebase (see the [
 	[PBPF] Singularity> ~/catkin_ws $ cd ~
 	[PBPF] Singularity> ~ $ 
 	```
+	```{Note}
+	dsdsf
+	```
+
+
 
 3. **Download Rendering Code**
 
-	```
+	```bash
+	user@pcName:~/<repo_dir>/PBPF$ cd PBPF/home
 	cd ~/the_folder_where_you_cloned_the_repo/PBPF/home
 	git clone --recurse git@github.com:billeter/pyvkdepth.git
 	```
