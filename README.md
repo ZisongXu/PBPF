@@ -51,6 +51,11 @@ We recommend using the Singularity container provided in our codebase (see the [
 	```bash
 	user@pcName:~/<repo_dir>/PBPF$ cd home
 	user@pcName:~/<repo_dir>/PBPF/home$ git clone --recurse git@github.com:billeter/pyvkdepth.git
+	user@pcName:~/<repo_dir>/PBPF/home$ cd ..
+	user@pcName:~/<repo_dir>/PBPF$ ./run.sh
+	[PBPF] Singularity> ~ $ cd pyvkdepth
+	[PBPF] Singularity> ~/pyvkdepth $ ./premake5 gmake2
+	[PBPF] Singularity> ~/pyvkdepth $ make -j8 config=release_x64
 	```
 
 4. **Prepare Scripts**
