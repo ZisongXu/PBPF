@@ -207,7 +207,7 @@ The above steps cover the entire process of running the code, but to ensure it r
 ```bash
 [PBPF] Singularity> ~/pyvkdepth/assets-src/meshes $ zstd object.obj -o object.obj.zst
 ```
-4. Add the following code to the `./PBPF/home/pyvkdepth/tests/bake.py` script to generate files for rendering: 
+4. Add the following code to the `./PBPF/home/pyvkdepth/tests/bake.py` script to generate files for rendering,
 ```python
 bake_obj(
     "assets/meshes/object.vkdepthmesh",
@@ -219,6 +219,8 @@ bake_obj(
     aSimplifyTarget = 0.1, aSimplifyMaxErr = 0.01
 );
 ```
+
+then you can find `object.vkdepthmesh` and `object-red.vkdepthmesh` files under the `./PBPF/home/pyvkdepth/assets/meshes` folder.
 
 
 
