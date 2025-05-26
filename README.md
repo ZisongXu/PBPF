@@ -160,10 +160,6 @@ We recommend using the Singularity container provided in our codebase (see the [
 	```
 	
 
-	
-
-
-
 <!-- 	
 4. **Edit Config Information** (if desired) in ```~/catkin_ws/src/PBPF/config/parameter_info.yaml```
 
@@ -182,6 +178,25 @@ We recommend using the Singularity container provided in our codebase (see the [
 	- ```update_style_flag```: Name of the method used (time/pose)
 	- ```version```: whether to use ray tracing (old/multiray) -->
 	
+
+<br>
+
+# ⚙️ Running Code
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
