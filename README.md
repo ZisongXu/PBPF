@@ -49,6 +49,21 @@ We recommend using the Singularity container provided in our codebase (see the [
 
 	Move the files from the `sh_scripts` folder in repo's `home` directory to the `pyvkdepth` folder in the `home` directory.
 
+
+	```text
+	MyProject/
+	├── src/            
+	│   └── main.py
+	├── configs/        
+	│   ├── base.yaml
+	│   └── dev.yaml
+	├── scripts/        
+	│   └── deploy.sh
+	└── README.md
+	```
+
+
+
 5. **Download Rosbags** (For running demos only)
 	
 	Download [the rosbags](https://leeds365-my.sharepoint.com/:f:/g/personal/scsmrd_leeds_ac_uk/Ej3ecEm8XFdDud6IfLTSw_sBTkiq29Wiul8XWYB9Xhzaug?e=Rpj9qy) (approximate 2.6TB).
