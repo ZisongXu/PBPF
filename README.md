@@ -40,7 +40,7 @@ We recommend using the Singularity container provided in our codebase (see the [
 	[PBPF] Singularity> ~ $ 
 	```
 
-	Press `ctrl+D` to exit the [PBPF] container.
+	Press `ctrl+D` to exit the `[PBPF]` container.
 
 
 
