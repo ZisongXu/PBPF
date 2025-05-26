@@ -39,9 +39,9 @@ We recommend using the Singularity container provided in our codebase (see the [
 	[PBPF] Singularity> ~/catkin_ws $ cd ~
 	[PBPF] Singularity> ~ $ 
 	```
-	```{note}
+
 	Press `ctrl+D` to exit the [PBPF] container.
-	```
+
 
 
 
