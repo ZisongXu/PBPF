@@ -201,10 +201,7 @@ The above steps cover the entire process of running the code, but to ensure it r
 
 ## 🧑‍🍳 Bake New Objects
 
-You need:
-
-- object.mtl
-- object.obj
+1. Prepare `object.mtl` and `object.obj`.
 
 
 
