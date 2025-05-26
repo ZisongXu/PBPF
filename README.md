@@ -42,6 +42,9 @@ We recommend using the Singularity container provided in our codebase (see the [
 	```{note}
 	dsdsf
 	```
+	```{note} 
+      Likewise, different `MoveIt` configurations are executed here based on the specific requirements.
+      ```
 
 
 
