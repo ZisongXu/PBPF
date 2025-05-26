@@ -5,21 +5,15 @@
 [[Project page]]()
 [[Paper]]()
 [[Data]](https://leeds365-my.sharepoint.com/:f:/g/personal/scsmrd_leeds_ac_uk/Ej3ecEm8XFdDud6IfLTSw_sBTkiq29Wiul8XWYB9Xhzaug?e=Rpj9qy)
-[[Colab (state)]](https://colab.research.google.com/drive/1gxdkgRVfM55zihY9TFLja97cSVZOZq2B?usp=sharing)
-[[Colab (vision)]](https://colab.research.google.com/drive/18GIHeOQ5DyjMN8iIRZL2EKZ0745NLIpg?usp=sharing)
 
+[Zisong Xu](https://github.com/ZisongXu)<sup>1</sup>,
+[Rafael Papallas](https://github.com/rpapallas)<sup>1, 2</sup>,
+[Jaina Modisett](https://github.com/citrus-tree)<sup>1</sup>,
+[Markus Billeter](https://github.com/billeter)<sup>1</sup>,
+[Mehmet R. Dogar](https://github.com/mdogar)<sup>1</sup>
 
-[Cheng Chi](http://cheng-chi.github.io/)<sup>1</sup>,
-[Siyuan Feng](https://www.cs.cmu.edu/~sfeng/)<sup>2</sup>,
-[Yilun Du](https://yilundu.github.io/)<sup>3</sup>,
-[Zhenjia Xu](https://www.zhenjiaxu.com/)<sup>1</sup>,
-[Eric Cousineau](https://www.eacousineau.com/)<sup>2</sup>,
-[Benjamin Burchfiel](http://www.benburchfiel.com/)<sup>2</sup>,
-[Shuran Song](https://www.cs.columbia.edu/~shurans/)<sup>1</sup>
-
-<sup>1</sup>Columbia University,
-<sup>2</sup>Toyota Research Institute,
-<sup>3</sup>MIT
+<sup>1</sup>School of Computer Science, University of Leeds,
+<sup>2</sup>Department of Computer Science, American University of Beirut - Mediterraneo
 
 ---
 
