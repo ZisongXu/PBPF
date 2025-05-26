@@ -15,7 +15,8 @@
 <sup>1</sup>University of Leeds,
 <sup>2</sup>American University of Beirut - Mediterraneo
 
----
+
+<img src="github_img/alg.png" alt="drawing" width="100%"/>
 
 
 This is the official implementation of the paper "Tracking and Control of Multiple Objects during Non-Prehensile Manipulation in Clutter".
