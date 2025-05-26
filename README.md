@@ -201,7 +201,8 @@ The above steps cover the entire process of running the code, but to ensure it r
 
 ## 🧑‍🍳 Bake New Objects
 
-1. Prepare `object.mtl` and `object.obj`.
+1. Prepare `object.mtl` and `object.obj`. 
+2. Put them into `/PBPF/home/pyvkdepth/assets-src/meshes/`
 
 
 
