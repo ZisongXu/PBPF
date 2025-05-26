@@ -169,6 +169,8 @@ We recommend using the Singularity container provided in our codebase (see the [
 	```
 	
 
+The above steps cover the entire process of running the code, but to ensure it runs smoothly, you need to make sure the file configurations are correct.
+
 <!-- 	
 4. **Edit Config Information** (if desired) in ```~/catkin_ws/src/PBPF/config/parameter_info.yaml```
 
@@ -190,7 +192,7 @@ We recommend using the Singularity container provided in our codebase (see the [
 
 <br>
 
-# ⚙️ Running Code
+# ⚙️ Bake OBjects
 
 
 
