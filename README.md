@@ -143,21 +143,20 @@ We recommend using the Singularity container provided in our codebase (see the [
 	```
 
 
-5. **Start Running** (For running demos only)
+4. **Start Running** (Only for using rosbags to run the code)
 
-	```$ ./automated_experiments.sh``` (Remember to change the directory of some files)
+
+	```bash
+	user@pcName:~/<repo_dir>/PBPF$ ./run.sh
+	[PBPF] Singularity> ~ $ cd pyvkdepth
+	[PBPF] Singularity> ~/pyvkdepth $ ./automated_experiments.sh
+	```
 	
-6. **Start Running**
+5. **Visualization Window**
 
-	```$ rosrun PBPF Physics_Based_Particle_Filtering.py```
+	```$ rosrun PBPF Visualisation_World_Particle.py```
 	
-7. **Visualization Window** (For visualizing only)
 
-	```$ rosrun PBPF Visualisation_World.py```
-	
-8. **Record Error** (For recording error only)
-
-	```$ rosrun PBPF RecordError.py _```
 	
 
 
