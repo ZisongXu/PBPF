@@ -1390,14 +1390,6 @@ if __name__ == '__main__':
     
     print("This is "+UPDATE_STYLE_FLAG+" update in scene"+TASK_FLAG)    
 
-    # some parameters
-    d_thresh = 0.005
-    a_thresh = 0.01
-    d_thresh_obse = 0.15
-    a_thresh_obse = math.pi * 2 / 3.0
-    d_thresh_CV = 0.0002
-    a_thresh_CV = 0.0010
-    
     if run_alg_flag == "PBPF":
         BOSS_PF_UPDATE_INTERVAL_IN_REAL = 0.25 
         print("Algorithm:",run_alg_flag,"; VERSION:", VERSION, "; RENDER MODEL:", RENDER_FLAG, "; RUNNING MODEL:", RUNNING_MODEL)
@@ -1450,9 +1442,7 @@ if __name__ == '__main__':
     pw_T_rob_sim_pose_list_alg = []
     pw_T_obj_obse_obj_list_alg = []
     pw_T_objs_touching_targetObjs_list = []
-    # need to change
-    dis_std_list = [d_thresh_obse]
-    ang_std_list = [a_thresh_obse]
+
     print("begin to wait")
     time.sleep(0.5)
 
