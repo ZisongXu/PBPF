@@ -147,8 +147,7 @@ PRINT_FLAG = parameter_info['print_flag']
 
 PRINT_SCORE_FLAG = parameter_info['print_score_flag'] 
 SHOW_RAY = parameter_info['show_ray']
-VK_RENDER_FLAG = parameter_info['vk_render_flag']
-PB_RENDER_FLAG = parameter_info['pb_render_flag']
+RENDER_FLAG = parameter_info['render_flag'] # 'vk', 'pb'
 PANDA_ROBOT_LINK_NUMBER = parameter_info['panda_robot_link_number']
 DRAW_WIREFRAME_FLAG = parameter_info['draw_wireframe_flag']
 
@@ -156,12 +155,14 @@ MASS_marker = parameter_info['MASS_marker']
 FRICTION_marker = parameter_info['FRICTION_marker']
 
 
-if VK_RENDER_FLAG == True:
+if RENDER_FLAG == 'vk':
     print("I am using Vulkan to generate Depth Image")
-if PB_RENDER_FLAG == True: 
+elif RENDER_FLAG == 'pb': 
     print("I am using Pybullet to generate Depth Image")
 SIM_TIME_STEP = 1.0/100
 
+# ==============================================================================================================================
+# create parameters for recording data
 _record_PBPF_esti_pose_list = []
 _record_PBPF_par_pose_list = []
 _record_obse_pose_list = []
@@ -194,9 +195,8 @@ for obj_index in range(OBJECT_NUM):
 for par_index in range(PARTICLE_NUM):
     _boss_par_err_ADD_df = pd.DataFrame(columns=['step','time','pos_x','pos_y','pos_z','ori_x','ori_y','ori_z','ori_w','alg','obj','scene','particle_num','ray_type','obj_name','mass','friction'],index=[])
     _boss_par_err_ADD_df_list[par_index] = _boss_par_err_ADD_df
-
-
-
+# ==============================================================================================================================
+# some debug parameters
 Motion_model_time_consuming_list = []
 Render_depth_image_time_comsuming_list = []
 Compare_depth_image_time_consuming_list = []
@@ -234,18 +234,9 @@ import sys
 sys.path.insert( 1, str(Path( __file__ ).parent.parent.absolute() / "bin") )
 ## Import module
 import vkdepth
-
-
-# pdv.release();
-# qdv.release();
-
 print("Launch Vkdepth successfully")
 # ==============================================================================================================================
-# mark
-# - gelatin
-
-# ===============================================================================================================
-
+# compute the position difference between two objects
 def compute_pos_err_bt_2_points(pos1, pos2):
     x1=pos1[0]
     y1=pos1[1]
@@ -258,7 +249,7 @@ def compute_pos_err_bt_2_points(pos1, pos2):
     z_d = z1-z2
     distance = math.sqrt(x_d ** 2 + y_d ** 2 + z_d ** 2)
     return distance
-# compute the angle distance between two objects
+# compute the rotation difference between two objects
 def compute_ang_err_bt_2_points(object1_ori, object2_ori):
     #[x, y, z, w]
     obj1_ori = copy.deepcopy(object1_ori)
@@ -1644,11 +1635,11 @@ if __name__ == '__main__':
         print("2: RUNNING_MODEL:", RUNNING_MODEL)
         BOSS_PF_UPDATE_INTERVAL_IN_REAL = 0.25 # original value = 0.16
         PF_UPDATE_TIME_ONCE = BOSS_PF_UPDATE_INTERVAL_IN_REAL # 70 particles -> 2s
-    elif RUNNING_MODEL == "PBPF_RGBD" and VK_RENDER_FLAG == True:
+    elif RUNNING_MODEL == "PBPF_RGBD" and RENDER_FLAG == 'vk':
         print("3: RUNNING_MODEL (VK):", RUNNING_MODEL)
         BOSS_PF_UPDATE_INTERVAL_IN_REAL = 0.25 # original value = 0.16 
         PF_UPDATE_TIME_ONCE = BOSS_PF_UPDATE_INTERVAL_IN_REAL # 70 particles -> 35s
-    elif RUNNING_MODEL == "PBPF_RGBD" and PB_RENDER_FLAG == True:
+    elif RUNNING_MODEL == "PBPF_RGBD" and RENDER_FLAG == 'pb':
         print("3: RUNNING_MODEL (PB):", RUNNING_MODEL)
         BOSS_PF_UPDATE_INTERVAL_IN_REAL = 0.25 # original value = 0.16 
         PF_UPDATE_TIME_ONCE = BOSS_PF_UPDATE_INTERVAL_IN_REAL # 70 particles -> 35s
@@ -1852,7 +1843,7 @@ if __name__ == '__main__':
 
     # ============================================================================
     # initialisation of vk configuration
-    if VK_RENDER_FLAG == True:
+    if RENDER_FLAG == 'vk':
         print("Begin initializing vulkon...")
         _camD_T_camVk_4_4 = np.array([[1, 0, 0, 0],
                                         [0,-1, 0, 0],
@@ -2314,7 +2305,7 @@ if __name__ == '__main__':
                         _real_depth_image_transferred = get_real_depth_image()
                         # a. Render Depth Image ###############################################################################
                         t_before_render = time.time()
-                        if VK_RENDER_FLAG == True and PB_RENDER_FLAG == False:
+                        if RENDER_FLAG == 'vk':
                             # get robot links pose
                             for env_index, single_env in _single_envs.items():
                                 single_env.queue.put((SingleENV.getLinkStates, ))

@@ -104,7 +104,6 @@ class SingleENV(multiprocessing.Process):
         self.task_flag = self.parameter_info['task_flag']
         self.SIM_REAL_WORLD_FLAG = self.parameter_info['sim_real_world_flag']
         self.SHOW_RAY = self.parameter_info['show_ray'] 
-        self.VK_RENDER_FLAG = self.parameter_info['vk_render_flag'] 
         self.OBJS_ARE_NOT_TOUCHING_TARGET_OBJS_NUM = self.parameter_info['objs_are_not_touching_target_objs_num']
         self.OBJS_TOUCHING_TARGET_OBJS_NUM = self.parameter_info['objs_touching_target_objs_num']
         self.OBJECT_NAME_LIST = self.parameter_info['object_name_list']
