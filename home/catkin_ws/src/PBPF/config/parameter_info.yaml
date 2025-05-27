@@ -18,7 +18,6 @@ draw_wireframe_flag: false
 err_file: rayTracing
 farVal: 3
 gazebo_flag: false
-height: 480
 ignore_edge_pixels: false
 locate_camera_flag: ar
 multiprocessing_flag: false
@@ -64,4 +63,3 @@ use_convolution_flag: false
 version: multiray
 visibility_compute_separate_flag: true
 visibility_compute_vk: true
-width: 848

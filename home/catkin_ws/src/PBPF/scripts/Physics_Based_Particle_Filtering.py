@@ -636,7 +636,7 @@ def track_fk_world_rob_mv(p_sim, sim_rob_id, joint_states):
             p_sim.resetJointState(sim_rob_id,
                                   joint_index,
                                   targetValue=joint_states[joint_index])
-                                  
+
 # ==============================================================================================================================
 
 def _vk_config_setting():
@@ -661,7 +661,6 @@ def _vk_camera_setting(pw_T_camD_tf_4_4, camD_T_camVk_4_4):
                              [ 0, 0, 0, 1]])
     pw_T_camVk_4_4_ = np.dot(pw_T_camVk_4_4_, trick_matrix)
 
-
     pw_T_camVk_pos = _get_position_from_matrix44(pw_T_camVk_4_4_)
     x_pos = pw_T_camVk_pos[0]
     y_pos = pw_T_camVk_pos[1]
@@ -684,19 +683,10 @@ def _vk_load_meshes():
     vk_obj_id_list = [0] * OBJECT_NUM
     vk_rob_link_id_list = [0] * PANDA_ROBOT_LINK_NUMBER # 11
     vk_other_id_list = []
-    # object
-    # a, b
+    # load tracking objects meshes
     for obj_index in range(OBJECT_NUM):
         obj_name = OBJECT_NAME_LIST[obj_index] # "cracker"/"soup"/"Ketchup"
-        if obj_name == "soup2":
-            obj_name = "soup"
-        obj_id = _vk_context.load_model("assets/meshes/"+obj_name+".vkdepthmesh")
-        
-        # if obj_index == 0:
-        #     obj_id = _vk_context.load_model("assets/meshes/cracker1.vkdepthmesh")
-        # elif obj_index == 1:
-        #     obj_id = _vk_context.load_model("assets/meshes/soup.vkdepthmesh")
-        
+        obj_id = _vk_context.load_model("assets/meshes/"+obj_name+".vkdepthmesh") 
         vk_obj_id_list[obj_index] = obj_id
     # robot
     # There are actually 13 links, of which "link8" and "panda_grasptarget" have no entities.
@@ -769,36 +759,6 @@ def _vk_load_meshes():
     return vk_obj_id_list, vk_rob_link_id_list, vk_other_id_list, vk_other_obj_info_list
     
 
-    # # table
-    # other_obj_id = _vk_context.load_model("assets/meshes/table.vkdepthmesh")
-    # vk_other_id_list.append(other_obj_id)
-    # # board
-    # other_obj_id = _vk_context.load_model("assets/meshes/board.vkdepthmesh")
-    # vk_other_id_list.append(other_obj_id)
-    # # barrier 1,2,3
-    # other_obj_id = _vk_context.load_model("assets/meshes/barrier.vkdepthmesh")
-    # vk_other_id_list.append(other_obj_id)
-    # other_obj_id = _vk_context.load_model("assets/meshes/barrier.vkdepthmesh")
-    # vk_other_id_list.append(other_obj_id)
-    # other_obj_id = _vk_context.load_model("assets/meshes/barrier.vkdepthmesh")
-    # vk_other_id_list.append(other_obj_id)
-    # # pringles
-    # if TASK_FLAG == '1':
-    #     other_obj_id = _vk_context.load_model("assets/meshes/pringles.vkdepthmesh")
-    #     vk_other_id_list.append(other_obj_id)
-    # # Milk, Milk, board
-    # if TASK_FLAG == '4':
-    #     other_obj_id = _vk_context.load_model("assets/meshes/Milk.vkdepthmesh")
-    #     vk_other_id_list.append(other_obj_id)
-    #     other_obj_id = _vk_context.load_model("assets/meshes/Milk.vkdepthmesh")
-    #     vk_other_id_list.append(other_obj_id)
-    #     other_obj_id = _vk_context.load_model("assets/meshes/board.vkdepthmesh")
-    #     vk_other_id_list.append(other_obj_id)
-
-    # # obj_id = _vk_context.load_model()
-    # # vk_other_id_list.append(obj_id)
-
-    # return vk_obj_id_list, vk_rob_link_id_list, vk_other_id_list
 
 
 # "particle setting"
