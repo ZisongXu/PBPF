@@ -759,8 +759,6 @@ def _vk_load_meshes():
     return vk_obj_id_list, vk_rob_link_id_list, vk_other_id_list, vk_other_obj_info_list
     
 
-
-
 # "particle setting"
 def _vk_state_setting(vk_particle_cloud, pw_T_camVk_4_4, pybullet_env, par_robot_id):
     global _vk_context
@@ -847,61 +845,6 @@ def _vk_state_setting(vk_particle_cloud, pw_T_camVk_4_4, pybullet_env, par_robot
                                   vk_other_obj_pos[0], vk_other_obj_pos[1], vk_other_obj_pos[2],
                                   vk_other_obj_ori[3], vk_other_obj_ori[0], vk_other_obj_ori[1], vk_other_obj_ori[2]) # w, x, y, z
             
-
-        # # table
-        # table_pos_1 = [0.46, -0.01, 0.70]
-        # table_ori_1 = p.getQuaternionFromEuler([0,0,0]) # x, y, z, w
-        # vk_state.add_instance(_vk_other_id_list[0],
-        #                       table_pos_1[0], table_pos_1[1], table_pos_1[2],
-        #                       table_ori_1[3], table_ori_1[0], table_ori_1[1], table_ori_1[2]) # w, x, y, z
-        # # board
-        # board_pos_1 = [0.274, 0.581, 0.87575]
-        # board_ori_1 = p.getQuaternionFromEuler([math.pi/2,math.pi/2,0]) # x, y, z, w
-        # vk_state.add_instance(_vk_other_id_list[1],
-        #                       board_pos_1[0], board_pos_1[1], board_pos_1[2],
-        #                       board_ori_1[3], board_ori_1[0], board_ori_1[1], board_ori_1[2]) # w, x, y, z
-        # # barrier 1,2,3
-        # barrier_pos_1 = [-0.694, 0.443, 0.895]
-        # barrier_ori_1 = p.getQuaternionFromEuler([0,math.pi/2,0]) # x, y, z, w
-        # vk_state.add_instance(_vk_other_id_list[2],
-        #                       barrier_pos_1[0], barrier_pos_1[1], barrier_pos_1[2],
-        #                       barrier_ori_1[3], barrier_ori_1[0], barrier_ori_1[1], barrier_ori_1[2]) # w, x, y, z
-        # barrier_pos_2 = [-0.694, -0.607, 0.895]
-        # barrier_ori_2 = p.getQuaternionFromEuler([0,math.pi/2,0]) # x, y, z, w
-        # vk_state.add_instance(_vk_other_id_list[3],
-        #                       barrier_pos_2[0], barrier_pos_2[1], barrier_pos_2[2],
-        #                       barrier_ori_2[3], barrier_ori_2[0], barrier_ori_2[1], barrier_ori_2[2]) # w, x, y, z
-        # barrier_pos_3 = [0.459, -0.972, 0.895]
-        # barrier_ori_3 = p.getQuaternionFromEuler([0,math.pi/2,math.pi/2]) # x, y, z, w
-        # vk_state.add_instance(_vk_other_id_list[4],
-        #                       barrier_pos_3[0], barrier_pos_3[1], barrier_pos_3[2],
-        #                       barrier_ori_3[3], barrier_ori_3[0], barrier_ori_3[1], barrier_ori_3[2]) # w, x, y, z
-        # # pringles
-        # if TASK_FLAG == '1':
-        #     pringles_pos_1 = [0.6652218209791124, 0.058946644391304814, 0.8277292172960276]
-        #     pringles_ori_1 = [ 0.67280124, -0.20574896, -0.20600051, 0.68012472] # x, y, z, w
-        #     vk_state.add_instance(_vk_other_id_list[5],
-        #                         pringles_pos_1[0], pringles_pos_1[1], pringles_pos_1[2],
-        #                         pringles_ori_1[3], pringles_ori_1[0], pringles_ori_1[1], pringles_ori_1[2]) # w, x, y, z
-        # # Milk, Milk, board
-        # if TASK_FLAG == '4':
-        #     Milk_pos_1 = [0.5255412218811237, 0.4112688983400049, 0.8156348920165202]
-        #     Milk_ori_1 = [ 0.71226091, -0.00120944, -0.00472836,  0.70189783] # x, y, z, w
-        #     vk_state.add_instance(_vk_other_id_list[5],
-        #                         Milk_pos_1[0], Milk_pos_1[1], Milk_pos_1[2],
-        #                         Milk_ori_1[3], Milk_ori_1[0], Milk_ori_1[1], Milk_ori_1[2]) # w, x, y, z
-        #     Milk_pos_2 = [0.5255412218811237, 0.4092688983400049, 0.8156348920165202-2*0.0358583]
-        #     Milk_ori_2 = [ 0.71226091, -0.00120944, -0.00472836,  0.70189783] # x, y, z, w
-        #     vk_state.add_instance(_vk_other_id_list[6],
-        #                         Milk_pos_2[0], Milk_pos_2[1], Milk_pos_2[2],
-        #                         Milk_ori_2[3], Milk_ori_2[0], Milk_ori_2[1], Milk_ori_2[2]) # w, x, y, z
-        #     board_pos_4 = [0.5254358709124907, 0.08732338308299908, 0.7967666216816303]
-        #     board_ori_4 = [0.10745146728023694, -6.812425524646768e-05, -0.0006642243648951836, 0.9942101067402217] # x, y, z, w
-        #     vk_state.add_instance(_vk_other_id_list[7],
-        #                         board_pos_4[0], board_pos_4[1], board_pos_4[2],
-        #                         board_ori_4[3], board_ori_4[0], board_ori_4[1], board_ori_4[2]) # w, x, y, z
-
-
         _vk_context.add_state(vk_state)
         # vk_state: 
         # 70
