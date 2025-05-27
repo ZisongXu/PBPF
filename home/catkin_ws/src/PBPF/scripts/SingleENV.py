@@ -624,37 +624,6 @@ class SingleENV(multiprocessing.Process):
                                                                              obj_cur_pos, obj_cur_ori,
                                                                              obj_id, obj_index, obj_pose_3_1)
 
-            if obj_index == 0:
-                normal_x = normal_x - 0.001
-                normal_y = normal_y + 0.000
-                normal_z = normal_z + 0.0000
-            elif obj_index == 1:
-                normal_x = normal_x + 0.002
-                normal_y = normal_y - 0.0000
-            elif obj_index == 2:
-                normal_x = normal_x - 0.002
-                normal_y = normal_y + 0.000
-            elif obj_index == 3:
-                normal_x = normal_x - 0.002
-                normal_y = normal_y + 0.000
-            elif obj_index == 4:
-                normal_x = normal_x - 0.005
-                normal_y = normal_y + 0.002
-
-            # if obj_index == 0:
-            #     normal_x = normal_x - 0.0005
-            #     normal_y = normal_y - 0.0000
-            #     normal_z = normal_z + 0.0000
-            # elif obj_index == 1:
-            #     normal_x = normal_x - 0.0002
-            #     normal_y = normal_y - 0.0002
-            # elif obj_index == 2:
-            #     normal_x = normal_x - 0.0000
-            # elif obj_index == 3:
-            #     normal_x = normal_x - 0.0000
-            # elif obj_index == 4:
-            #     normal_x = normal_x - 0.0000
-
             self.update_object_pose_PB(obj_index, normal_x, normal_y, normal_z, pb_quat, linearVelocity, angularVelocity)
         self.p_env.stepSimulation()
         return_results = self.get_objects_pose(par_index)
