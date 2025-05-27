@@ -54,7 +54,7 @@ import yaml
 #Class of initialize the simulation model
 class SingleENV(multiprocessing.Process):
     def __init__(self, object_num, robot_num, particle_num,
-                 pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg, pw_T_objs_touching_targetObjs_list,
+                 pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg,
                  update_style_flag, sim_time_step, pf_update_interval_in_real, 
                  result_dict, daemon=True):
         super().__init__(daemon=daemon)
@@ -67,7 +67,6 @@ class SingleENV(multiprocessing.Process):
         self.particle_num = particle_num
         self.pw_T_rob_sim_pose_list_alg = pw_T_rob_sim_pose_list_alg
         self.pw_T_obj_obse_obj_list_alg = pw_T_obj_obse_obj_list_alg
-        self.pw_T_objs_touching_targetObjs_list = pw_T_objs_touching_targetObjs_list
         self.update_style_flag = update_style_flag
         self.sim_time_step = sim_time_step
         self.pf_update_interval_in_real = pf_update_interval_in_real

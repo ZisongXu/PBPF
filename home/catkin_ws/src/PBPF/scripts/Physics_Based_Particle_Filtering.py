@@ -1006,11 +1006,11 @@ def compare_depth_image_vk_parallelised(real_depth_image_transferred):
 
 
 def create_particles(object_num, robot_num, particle_num,
-                     pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg, pw_T_objs_touching_targetObjs_list, 
+                     pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg, 
                      update_style_flag, sim_time_step, boss_pf_update_interval_in_real):
     manager = multiprocessing.Manager()
     single_envs_ = {i: SingleENV(object_num, robot_num, particle_num,
-                                 pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg, pw_T_objs_touching_targetObjs_list, 
+                                 pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg, 
                                  update_style_flag, sim_time_step, boss_pf_update_interval_in_real,
                                  manager.dict()) for i in range(particle_num)}
     for _, single_env in single_envs_.items():
@@ -1228,7 +1228,7 @@ def compare_distance_seq(particle_cloud, pw_T_obj_obse_objects_pose_list, visual
                     dis_y = abs(obj_y - obse_obj_pos[1])
                     dis_z = abs(obj_z - obse_obj_pos[2])
                     dis_xyz = math.sqrt(dis_x ** 2 + dis_y ** 2 + dis_z ** 2)
-                    weight_xyz = normal_distribution(dis_xyz, mean, BOSS_SIGMA_OBS_POS)
+                    weight_xyz = normal_distribution(dis_xyz, mean, BOSS_SIGMA_OBS_POS_FOR_RESAMPLE_LIST[obj_index])
                     # rotation weight
                     obse_obj_quat = Quaternion(x=obse_obj_ori[0], y=obse_obj_ori[1], z=obse_obj_ori[2], w=obse_obj_ori[3]) # Quaternion(): w,x,y,z
                     par_quat = Quaternion(x=obj_ori[0], y=obj_ori[1], z=obj_ori[2], w=obj_ori[3])
@@ -1239,7 +1239,7 @@ def compare_distance_seq(particle_cloud, pw_T_obj_obse_objects_pose_list, visual
                     sin_theta_over_2 = math.sqrt(err_bt_par_obse_corr_quat.x ** 2 + err_bt_par_obse_corr_quat.y ** 2 + err_bt_par_obse_corr_quat.z ** 2)
                     theta_over_2 = math.atan2(sin_theta_over_2, cos_theta_over_2)
                     theta = theta_over_2 * 2.0
-                    weight_ang = normal_distribution(theta, mean, BOSS_SIGMA_OBS_ANG)
+                    weight_ang = normal_distribution(theta, mean, BOSS_SIGMA_OBS_ANG_FOR_RESAMPLE_LIST[obj_index])
                     weight = weight_xyz * weight_ang
                     particle_cloud[par_index][obj_index].w = weight
                     weights_list[obj_index] = weight
@@ -1315,9 +1315,6 @@ def signal_handler(sig, frame):
     sys.exit()
 
 if __name__ == '__main__':
-    # CVPF Pose list (motion model)
-    boss_obs_pose_CVPF = []
-    boss_est_pose_CVPF = []
     rospy.init_node('PBPF') # ros node
     signal.signal(signal.SIGINT, signal_handler) # interrupt judgment
     # publish
@@ -1361,6 +1358,7 @@ if __name__ == '__main__':
         PARTICLE_NUM = 150
     
     # ============================================================================
+
     # get camera intrinsic info
     # CAMERA_INFO_TOPIC_COLOR: "/camera/color/camera_info"
     # CAMERA_INFO_TOPIC_DEPTH: "/camera/depth/camera_info"
@@ -1378,6 +1376,7 @@ if __name__ == '__main__':
     FOV_V_DEPTH = math.degrees(2 * math.atan(HEIGHT_DEPTH / (2*FY_DEPTH))) # fov: vertical / y
     
     RESOLUTION_DEPTH = (HEIGHT_DEPTH, WIDTH_DEPTH) # 480 848
+
     # ============================================================================
 
     pub_DOPE_list = []
@@ -1390,6 +1389,8 @@ if __name__ == '__main__':
     
     print("This is "+UPDATE_STYLE_FLAG+" update in scene"+TASK_FLAG)    
 
+    # ============================================================================
+
     if run_alg_flag == "PBPF":
         BOSS_PF_UPDATE_INTERVAL_IN_REAL = 0.25 
         print("Algorithm:",run_alg_flag,"; VERSION:", VERSION, "; RENDER MODEL:", RENDER_FLAG, "; RUNNING MODEL:", RUNNING_MODEL)
@@ -1400,55 +1401,29 @@ if __name__ == '__main__':
     PF_UPDATE_RATE = rospy.Rate(1.0/BOSS_PF_UPDATE_INTERVAL_IN_REAL)
     print("PF UPDATE TIME FREQUENCY:", BOSS_PF_UPDATE_INTERVAL_IN_REAL)
 
-    # Motion model Noise
-    POS_NOISE = 0.01 # original value = 0.005
-    ANG_NOISE = 0.1 # original value = 0.05
-    MOTION_NOISE = True
-    
-    # Standard deviation of computing the weight
-    
+    # ============================================================================
+
+    BOSS_SIGMA_OBS_POS_FOR_RESAMPLE_LIST = [0.05] * OBJECT_NUM
+    BOSS_SIGMA_OBS_ANG_FOR_RESAMPLE_LIST = [0.2] * OBJECT_NUM
     for obj_index in range(OBJECT_NUM):
         object_name = OBJECT_NAME_LIST[obj_index]
+        BOSS_SIGMA_OBS_POS_FOR_RESAMPLE_LIST[obj_index] = 0.05
         if object_name == "cracker":
-            # BOSS_SIGMA_OBS_POS = 0.10
-            BOSS_SIGMA_OBS_POS = 0.05
-            BOSS_SIGMA_OBS_ANG = 0.0216773873 * 30
-            POS_NOISE = 0.001 * 5.0 # 5
-            ANG_NOISE = 0.05 * 3.0 # 3.0
-            # mark
-            # POS_NOISE = 0.0
-            # ANG_NOISE = 0.0
+            BOSS_SIGMA_OBS_ANG_FOR_RESAMPLE_LIST[obj_index] = 0.6
         else:
-            # BOSS_SIGMA_OBS_POS = 0.10 # 0.02 need to increase
-            BOSS_SIGMA_OBS_POS = 0.05 # 0.02 need to increase
-            BOSS_SIGMA_OBS_ANG = 0.0216773873 * 10
-            POS_NOISE = 0.001 * 5.0
-            ANG_NOISE = 0.05 * 1.0 # 3.0
-            # mark
-            # POS_NOISE = 0.0
-            # ANG_NOISE = 0.0
+            BOSS_SIGMA_OBS_ANG_FOR_RESAMPLE_LIST[obj_index] = 0.2
 
-    # mark
-    MASS_MEAN = 1.750 # 0.380
-    MASS_SIGMA = 0.5
-    FRICTION_MEAN = 0.1
-    FRICTION_SIGMA = 0.3
-    RESTITUTION_MEAN = 0.9
-    RESTITUTION_SIGMA = 0.2
+    # ============================================================================
 
-
-
-    # multi-objects/robot list
-    pw_T_rob_sim_pose_list_alg = []
-    pw_T_obj_obse_obj_list_alg = []
-    pw_T_objs_touching_targetObjs_list = []
-
-    print("begin to wait")
     time.sleep(0.5)
+
+    # ============================================================================
 
     # build an object of class "Ros_Listener"
     ROS_LISTENER = Ros_Listener()
     _tf_listener = tf.TransformListener()
+    
+    # ============================================================================
     
     create_scene = Create_Scene(OBJECT_NUM, ROBOT_NUM)
     _launch_camera = LaunchCamera(WIDTH_DEPTH, HEIGHT_DEPTH, FOV_V_DEPTH)
@@ -1473,51 +1448,11 @@ if __name__ == '__main__':
     print("========================")
     print("Finish initializing scene")
 
-    # ============================================================================
-    # we are not using this for now
-    # if TASK_FLAG == '4':
-    #     objs_touching_target_objs_num_ = OBJS_TOUCHING_TARGET_OBJS_NUM
-    #     objs_touching_target_objs_num_ = 1
-    #     objs_touching_target_objs_name_list = ["base"]
-    #     pw_T_objs_touching_targetObjs = create_scene.initialize_other_objects_touching(objs_touching_target_objs_num_, objs_touching_target_objs_name_list)
-    #     for num_index in range(len(pw_T_objs_touching_targetObjs)):
-    #         pw_T_objs_touching_targetObjs_list.append(pw_T_objs_touching_targetObjs[num_index])
-    # if TASK_FLAG == '1':
-    #     objs_not_touching_target_objs_num_ = OBJS_ARE_NOT_TOUCHING_TARGET_OBJS_NUM
-    #     objs_not_touching_target_objs_num_ = 0
-    #     objs_not_touching_target_objs_name_list = ["pringles"]
-    #     pw_T_objs_not_touching_targetObjs = create_scene.initialize_other_objects_not_touching(objs_not_touching_target_objs_num_, objs_not_touching_target_objs_name_list)
-    # ============================================================================
-    
-    
-    
-    
-    # ============================================================================
-    ################# Only for test
-    # c_pw_T_target_obj_obse_pose_lsit = []
-    # for obj_index in range(len(pw_T_obj_obse_obj_list_alg)):        
-    #     if obj_index == 0:
-    #         pw_T_obj_obse_pos = [0.3876914528076614, -0.21410733510489965, 0.7852905085928885]
-    #         pw_T_obj_obse_ori = [ 0.53965167, -0.46331638,  0.52678137,  0.46541959]
-
-    #         # pw_T_obj_obse_pos = [0.44387777404766426, -0.24483345047213362, 0.7748352994472808]
-    #         # pw_T_obj_obse_ori = [-0.55190256,  0.44159203,  0.58406295,  0.3990871 ]
-    #     elif obj_index == 1:
-    #         pw_T_obj_obse_pos = [0.30957266108125187, -0.1979083263216742, 0.7523182803351007]
-    #         pw_T_obj_obse_ori = [-0.61143742,  0.36735759, -0.35623665,  0.60356286]
-    #     elif obj_index == 2:
-    #         pw_T_obj_obse_pos = [0.3948234965404585, -0.1039755313382335, 0.7755253068476263]
-    #         pw_T_obj_obse_ori = [-0.49862651,  0.52125916,  0.49984925,  0.47938629]
-    #     # pw_T_obj_obse_pos = pw_T_obj_obse_obj_list_alg[obj_index].pos
-    #     # pw_T_obj_obse_ori = pw_T_obj_obse_obj_list_alg[obj_index].ori
-    #     c_obse_obj = Object_Pose(OBJECT_NAME_LIST[obj_index], 0, pw_T_obj_obse_pos, pw_T_obj_obse_ori, obj_index)
-    #     c_pw_T_target_obj_obse_pose_lsit.append(c_obse_obj)
 
     # cpu 
     # create 70 "objects" of SingleENV class 
     _single_envs = create_particles(OBJECT_NUM, ROBOT_NUM, PARTICLE_NUM,
-                                    pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg, pw_T_objs_touching_targetObjs_list, # pw_T_objs_touching_targetObjs_list is empty
-                                    # pw_T_rob_sim_pose_list_alg, c_pw_T_target_obj_obse_pose_lsit, pw_T_objs_touching_targetObjs_list, # pw_T_objs_touching_targetObjs_list is empty
+                                    pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg, 
                                     UPDATE_STYLE_FLAG, SIM_TIME_STEP, BOSS_PF_UPDATE_INTERVAL_IN_REAL)
 
     _objs_pose_info_list = [0] * PARTICLE_NUM
