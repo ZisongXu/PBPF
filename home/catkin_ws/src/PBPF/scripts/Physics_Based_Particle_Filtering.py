@@ -150,6 +150,7 @@ SHOW_RAY = parameter_info['show_ray']
 RENDER_FLAG = parameter_info['render_flag'] # 'vk', 'pb'
 PANDA_ROBOT_LINK_NUMBER = parameter_info['panda_robot_link_number']
 DRAW_WIREFRAME_FLAG = parameter_info['draw_wireframe_flag']
+TEST_INITIAL_RENDERED_DEPTH_IMAGE_FLAG = parameter_info['test_initial_rendered_depth_image_flag']
 
 MASS_marker = parameter_info['MASS_marker']
 FRICTION_marker = parameter_info['FRICTION_marker']
@@ -678,20 +679,21 @@ def _vk_camera_setting(pw_T_camD_tf_4_4, camD_T_camVk_4_4):
 
     return vk_camera, pw_T_camVk_4_4_
 
-def _vk_load_meshes():
+def _vk_load_target_objects_meshes():
     global _vk_context
-    vk_obj_id_list = [0] * OBJECT_NUM
-    vk_rob_link_id_list = [0] * PANDA_ROBOT_LINK_NUMBER # 11
-    vk_other_id_list = []
-    # load tracking objects meshes
+    vk_obj_id_list_ = [0] * OBJECT_NUM
     for obj_index in range(OBJECT_NUM):
         obj_name = OBJECT_NAME_LIST[obj_index] # "cracker"/"soup"/"Ketchup"
         obj_id = _vk_context.load_model("assets/meshes/"+obj_name+".vkdepthmesh") 
-        vk_obj_id_list[obj_index] = obj_id
-    # robot
+        vk_obj_id_list_[obj_index] = obj_id
+    return vk_obj_id_list_
+
+def _vk_load_robot_meshes():
     # There are actually 13 links, of which "link8" and "panda_grasptarget" have no entities.
     ## "link0,1,2,3,4,5,6,7", "panda_hand", "panda_left_finger", "panda_right_finger"
     # index:0,1,2,3,4,5,6,7,   9,            10,                  11    
+    global _vk_context
+    vk_rob_link_id_list_ = [0] * PANDA_ROBOT_LINK_NUMBER # 11
     for link_index in range(PANDA_ROBOT_LINK_NUMBER):
         if link_index < 8:
             rob_link_id = _vk_context.load_model("assets/meshes/link"+str(link_index)+".vkdepthmesh")
@@ -701,61 +703,62 @@ def _vk_load_meshes():
             rob_link_id = _vk_context.load_model("assets/meshes/left_finger.vkdepthmesh")
         elif link_index == 10:
             rob_link_id = _vk_context.load_model("assets/meshes/right_finger.vkdepthmesh")
-        vk_rob_link_id_list[link_index] = rob_link_id
+        vk_rob_link_id_list_[link_index] = rob_link_id
+    return vk_rob_link_id_list_
 
-    vk_other_obj_info_list = []
+
+def _vk_load_env_objects_meshes():
+    """
+    Build Experimental Environment
+    """
+    global _vk_context
+    vk_other_id_list_ = []
+    vk_other_obj_info_list_ = []
+
     # table
     other_obj_id = _vk_context.load_model("assets/meshes/table.vkdepthmesh")
-    vk_other_id_list.append(other_obj_id)
+    vk_other_id_list_.append(other_obj_id)
     vk_other_obj_info = Object_Pose(obj_name='table', obj_id=0, pos=[0.46, -0.01, 0.702], ori=p.getQuaternionFromEuler([0,0,0]), index=0) # ori: x, y, z, w   
-    vk_other_obj_info_list.append(vk_other_obj_info)
-
+    vk_other_obj_info_list_.append(vk_other_obj_info)
     # board
-    if TASK_FLAG != '4':
-        other_obj_id = _vk_context.load_model("assets/meshes/board.vkdepthmesh")
-        vk_other_id_list.append(other_obj_id)
-        vk_other_obj_info = Object_Pose(obj_name='board', obj_id=1, pos=[0.274, 0.581, 0.87575], ori=p.getQuaternionFromEuler([math.pi/2,math.pi/2,0]), index=0) # ori: x, y, z, w           
-        vk_other_obj_info_list.append(vk_other_obj_info)
-
+    other_obj_id = _vk_context.load_model("assets/meshes/board.vkdepthmesh")
+    vk_other_id_list_.append(other_obj_id)
+    vk_other_obj_info = Object_Pose(obj_name='board', obj_id=1, pos=[0.274, 0.581, 0.87575], ori=p.getQuaternionFromEuler([math.pi/2,math.pi/2,0]), index=0) # ori: x, y, z, w           
+    vk_other_obj_info_list_.append(vk_other_obj_info)
     # barrier 1,2,3
     other_obj_id = _vk_context.load_model("assets/meshes/barrier.vkdepthmesh")
-    vk_other_id_list.append(other_obj_id)
+    vk_other_id_list_.append(other_obj_id)
     vk_other_obj_info = Object_Pose(obj_name='barrier1', obj_id=0, pos=[-0.694, 0.443, 0.895], ori=p.getQuaternionFromEuler([0,math.pi/2,0]), index=0) # ori: x, y, z, w          
-    vk_other_obj_info_list.append(vk_other_obj_info)
+    vk_other_obj_info_list_.append(vk_other_obj_info)
     other_obj_id = _vk_context.load_model("assets/meshes/barrier.vkdepthmesh")
-    vk_other_id_list.append(other_obj_id)
+    vk_other_id_list_.append(other_obj_id)
     vk_other_obj_info = Object_Pose(obj_name='barrier2', obj_id=0, pos=[-0.694, -0.607, 0.895], ori=p.getQuaternionFromEuler([0,math.pi/2,0]), index=0) # ori: x, y, z, w          
-    vk_other_obj_info_list.append(vk_other_obj_info)
+    vk_other_obj_info_list_.append(vk_other_obj_info)
     other_obj_id = _vk_context.load_model("assets/meshes/barrier.vkdepthmesh")
-    vk_other_id_list.append(other_obj_id)
+    vk_other_id_list_.append(other_obj_id)
     vk_other_obj_info = Object_Pose(obj_name='barrier3', obj_id=0, pos=[0.459, -0.972, 0.895], ori=p.getQuaternionFromEuler([0,math.pi/2,math.pi/2]), index=0) # ori: x, y, z, w          
-    vk_other_obj_info_list.append(vk_other_obj_info) 
-    
+    vk_other_obj_info_list_.append(vk_other_obj_info) 
     # pringles
     if TASK_FLAG == '1':
         other_obj_id = _vk_context.load_model("assets/meshes/pringles.vkdepthmesh")
-        vk_other_id_list.append(other_obj_id)
+        vk_other_id_list_.append(other_obj_id)
         vk_other_obj_info = Object_Pose(obj_name='pringles', obj_id=0, pos=[0.6652218209791124, 0.058946644391304814, 0.8277292172960276], ori=[ 0.67280124, -0.20574896, -0.20600051, 0.68012472], index=0) # ori: x, y, z, w           
-        vk_other_obj_info_list.append(vk_other_obj_info) 
-    if TASK_FLAG == '4':
-        other_obj_id = _vk_context.load_model("assets/meshes/Milk.vkdepthmesh")
-        vk_other_id_list.append(other_obj_id)
-        vk_other_obj_info = Object_Pose(obj_name='Milk1', obj_id=0, pos=[0.5255412218811237, 0.4112688983400049, 0.8156348920165202-0.01-0.01], ori=[ 0.71226091, -0.00120944, -0.00472836,  0.70189783], index=0) # ori: x, y, z, w           
-        vk_other_obj_info_list.append(vk_other_obj_info) 
-        other_obj_id = _vk_context.load_model("assets/meshes/Milk.vkdepthmesh")
-        vk_other_id_list.append(other_obj_id)
-        vk_other_obj_info = Object_Pose(obj_name='Milk2', obj_id=0, pos=[0.5255412218811237, 0.4092688983400049, 0.8156348920165202-2*0.0358583], ori=[ 0.71226091, -0.00120944, -0.00472836,  0.70189783], index=0) # ori: x, y, z, w           
-        vk_other_obj_info_list.append(vk_other_obj_info) 
-        other_obj_id = _vk_context.load_model("assets/meshes/board.vkdepthmesh")
-        vk_other_id_list.append(other_obj_id)
-        vk_other_obj_info = Object_Pose(obj_name='board4', obj_id=0, pos=[0.5255245316420766, 0.08585146275273556, 0.7858109052752488], ori=[0.0921379328294458, -1.0388626282143925e-05, -0.00014271076727580726, 0.9957462432063853], index=0) # ori: x, y, z, w           
-        vk_other_obj_info_list.append(vk_other_obj_info) 
-    if TASK_FLAG == "6":
-        other_obj_id = _vk_context.load_model("assets/meshes/Milk.vkdepthmesh")
-        vk_other_id_list.append(other_obj_id)
-        vk_other_obj_info = Object_Pose(obj_name='Milk', obj_id=0, pos=[0.5639079993582834, 0.06686931205630225, 0.7947410960108179], ori=[-0.61877113,  0.33879951,  0.61984684,  0.3436962 ], index=0) # ori: x, y, z, w           
-        vk_other_obj_info_list.append(vk_other_obj_info) 
+        vk_other_obj_info_list_.append(vk_other_obj_info) 
 
+    return vk_other_id_list_, vk_other_obj_info_list_
+
+def _vk_load_meshes():
+    global _vk_context
+    vk_obj_id_list = [0] * OBJECT_NUM
+    vk_rob_link_id_list = [0] * PANDA_ROBOT_LINK_NUMBER # 11
+    vk_other_id_list = []
+    vk_other_obj_info_list = []
+    # load tracking objects meshes
+    vk_obj_id_list = _vk_load_target_objects_meshes()
+    # load robot meshes
+    vk_rob_link_id_list = _vk_load_robot_meshes()
+    # load env objects meshes
+    vk_other_id_list, vk_other_obj_info_list = _vk_load_env_objects_meshes()
     return vk_obj_id_list, vk_rob_link_id_list, vk_other_id_list, vk_other_obj_info_list
     
 
@@ -1731,12 +1734,13 @@ if __name__ == '__main__':
         #         print(obj_pixel_num, total_elements)
         #         print(single_obj_num_zeros)
         
-        # # show vk rendered depth image
-        # fig, axs = plt.subplots(2, PARTICLE_NUM)
-        # for par_index in range(PARTICLE_NUM):
-        #     axs[0, par_index].imshow(vk_rendered_depth_image_array_list[par_index], cmap="gray")
-        #     axs[1, par_index].imshow(vk_rendered__mask_image_array_list[par_index], cmap="gray")
-        # plt.show()
+        # show vk rendered depth image
+        if TEST_INITIAL_RENDERED_DEPTH_IMAGE_FLAG == True:
+            fig, axs = plt.subplots(2, PARTICLE_NUM)
+            for par_index in range(PARTICLE_NUM):
+                axs[0, par_index].imshow(vk_rendered_depth_image_array_list[par_index], cmap="gray")
+                axs[1, par_index].imshow(vk_rendered__mask_image_array_list[par_index], cmap="gray")
+            plt.show()
     # ============================================================================
 
     print("Welcome to Our Approach ! RUNNING MODEL: ", RUNNING_MODEL)

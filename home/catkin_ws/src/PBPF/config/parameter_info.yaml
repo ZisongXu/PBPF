@@ -57,6 +57,7 @@ show_particle_depth_image_to_point_cloud_flag: false
 show_ray: false
 sim_real_world_flag: true
 task_flag: '1'
+test_initial_rendered_depth_image_flag: false
 update_style_flag: time
 use_convolution_flag: false
 version: multiray
