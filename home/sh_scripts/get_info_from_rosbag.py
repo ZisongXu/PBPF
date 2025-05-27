@@ -24,7 +24,7 @@ wait_time_rate = math.ceil(1.0 / slow_down_rate)
 # info_dict = yaml.load(Bag(os.path.expanduser(f"~/pyvkdepth/rosbag/2_scene1_new_camera_MayoMilk{rosbag_num}.bag"))._get_yaml_info(), Loader=yaml.FullLoader)
 # info_dict = yaml.load(Bag(os.path.expanduser(f"~/pyvkdepth/rosbag/1_{scene_name}_Mustard{rosbag_num}.bag"))._get_yaml_info(), Loader=yaml.FullLoader)
 # info_dict = yaml.load(Bag(os.path.expanduser(f"~/pyvkdepth/rosbag/1_{scene_name}_{object_name}{rosbag_num}.bag"))._get_yaml_info(), Loader=yaml.FullLoader)
-info_dict = yaml.load(Bag(os.path.expanduser(f"~/pyvkdepth/rosbag/3_scene2_crackersoupParmesan2.bag"))._get_yaml_info(), Loader=yaml.FullLoader)
+info_dict = yaml.load(Bag(os.path.expanduser(f"~/pyvkdepth/rosbag/2_scene1_crackersoup1.bag"))._get_yaml_info(), Loader=yaml.FullLoader)
 # info_dict = yaml.load(Bag(os.path.expanduser(f"~/rosbag/pointcloud_cracker2.bag"))._get_yaml_info(), Loader=yaml.FullLoader)
 
 dura = (info_dict['duration']) * wait_time_rate + 1

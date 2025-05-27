@@ -1,8 +1,8 @@
 #!/bin/bash
 
 declare -a objectNames=("cracker") # "cracker" "Ketchup" "Mayo" "Milk" "Mustard" "Parmesan" "SaladDressing" "soup"
-declare -a sceneNames=("scene2") # "scene1" "scene2" "scene3" "scene4"
-declare -a particleNumbers=(40) # 40, 50, 70
+declare -a sceneNames=("scene1") # "scene1" "scene2" "scene3" "scene4"
+declare -a particleNumbers=(50) # 40, 50, 70
 declare -a slowDownRates=(1)
 declare -a runAlgFlags=("PBPF")
 declare -a repeats=(1)
@@ -47,7 +47,7 @@ do
 										echo "I will sleep for $duration seconds"
 								
 										# rosbag play "rosbag/1_${sceneName}_${objectName}${rosbag}.bag" --clock --rate ${slowDownRate}  > /dev/null 2>&1 & 
-										rosbag play "rosbag/3_scene2_crackersoupParmesan2.bag" --clock --rate ${slowDownRate} --start 0  > /dev/null 2>&1 & 
+										rosbag play "rosbag/2_scene1_crackersoup1.bag" --clock --rate ${slowDownRate} --start 0  > /dev/null 2>&1 & 
 
 										ROSBAGPID=$!
 
