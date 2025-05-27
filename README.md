@@ -242,7 +242,7 @@ The above steps cover the entire process of running the code, but to ensure it r
 
 ## 🏞️ Change the Experimental Environment
 
-1. Update the Rendered Images
+1. **Update the Rendered Images**
 
 	Ensure consistency between the rendered images and the real environment by modifying the `_vk_load_target_objects_meshes`, `_vk_load_robot_meshes`, `_vk_load_env_objects_meshes`, and `_vk_state_setting` functions in the `./PBPF/home/catkin_ws/src/PBPF/scripts/Physics_Based_Particle_Filtering.py` scripts.
 	- Function `_vk_load_target_objects_meshes` is used to update the target object in the rendered image.
@@ -253,7 +253,7 @@ The above steps cover the entire process of running the code, but to ensure it r
 	Each function comes with corresponding examples to help you understand how it works.
 
 
-2. Update the Physical Simulation Environment
+2. **Update the Physical Simulation Environment**
 
 
 

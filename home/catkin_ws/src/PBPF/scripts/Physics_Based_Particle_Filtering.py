@@ -992,11 +992,6 @@ def visibility_computing_vk(particle_cloud, RGB_weights_lists_):
                         weight = visible_weight_dope_X_larger_than_threshold_list[obj_index] * weight # 0.25/0.5
             particle_cloud[index][obj_index].w = weight
 
-
-            
-                
-
-
     return particle_cloud
 
 # compare depth image
@@ -1068,16 +1063,7 @@ def resample_particles_update(particle_cloud, pw_T_obj_obse_objects_pose_list_, 
         else:
             while True:
                 print("Not yet implemented")
-    
-    # # normalize_RGB_weight    
-    # for obj_index in range(OBJECT_NUM):
-    #     weight_RGB_img_list_ = [particle[obj_index].w for particle in particle_cloud]
-    #     weight_RGB_img_list_new = normalize_score_to_0_1(weight_RGB_img_list_)
-    #     # 直接用 zip() 赋值，提高效率
-    #     for particle, new_weight in zip(particle_cloud, weight_RGB_img_list_new):
-    #         particle[obj_index].w = new_weight
-    
-    
+
     for index, particle in enumerate(particle_cloud):
         each_par_weight = 1
         for obj_index in range(OBJECT_NUM):
@@ -1273,70 +1259,6 @@ def normal_distribution(x, mean, sigma):
 def signal_handler(sig, frame):
 
     if RECORD_RESULTS_FLAG == True:
-        # # save estimation pose (PBPF)
-        # esti_pose_num = len(_record_PBPF_esti_pose_list)
-        # obse_pose_num = len(_record_obse_pose_list)
-        # GT_pose_num = len(_record_GT_pose_list)
-        # record_time_num = len(_record_time_list)
-        # print("esti_pose_num:", esti_pose_num)
-        # print("obse_pose_num:", obse_pose_num)
-        # print("GT_pose_num:", GT_pose_num)
-        # print("record_time_num:", record_time_num)
-
-        # for esti_pose_index in range(esti_pose_num):
-        #     for obj_index in range(OBJECT_NUM):
-        #         esti_obj_info = _record_PBPF_esti_pose_list[esti_pose_index][obj_index]
-        #         pos_x = esti_obj_info.pos[0]
-        #         pos_y = esti_obj_info.pos[1]
-        #         pos_z = esti_obj_info.pos[2]
-        #         pw_T_esti_PBPF_pos = [pos_x, pos_y, pos_z]
-        #         ori_x = esti_obj_info.ori[0]
-        #         ori_y = esti_obj_info.ori[1]
-        #         ori_z = esti_obj_info.ori[2]
-        #         ori_w = esti_obj_info.ori[3]
-        #         pw_T_esti_PBPF_ori = [ori_x, ori_y, ori_z, ori_w]
-        #         pw_T_esti_PBPF_3_3 = np.array(p.getMatrixFromQuaternion(pw_T_esti_PBPF_ori)).reshape(3, 3)
-        #         pw_T_esti_PBPF_3_4 = np.c_[pw_T_esti_PBPF_3_3, pw_T_esti_PBPF_pos]  # Add position to create 3x4 matrix
-        #         pw_T_esti_PBPF_4_4 = np.r_[pw_T_esti_PBPF_3_4, [[0, 0, 0, 1]]]  # Convert to 4x4 homogeneous matrix
-        #         time_row = np.zeros(pw_T_esti_PBPF_4_4.shape[1])
-        #         time_row[0] = _record_time_list[esti_pose_index]
-        #         pw_T_esti_PBPF_4_4_with_time = np.vstack((pw_T_esti_PBPF_4_4, time_row))
-        #         file_save_path = os.path.expanduser('~/catkin_ws/src/PBPF/scripts/results/'+str(REPEAT_TIME)+'/'+RUNNING_MODEL+'/')
-        #         file_name = str(esti_pose_index)+'_'+OBJECT_NAME_LIST[obj_index]+'_PBPF.txt'
-        #         np.savetxt(file_save_path + file_name, pw_T_esti_PBPF_4_4_with_time, fmt='%.6e', delimiter=' ')
-
-        # for obse_pose_index in range(obse_pose_num):
-        #     for obj_index in range(OBJECT_NUM):
-        #         obse_obj_info = _record_obse_pose_list[obse_pose_index][obj_index]
-        #         pos_x = obse_obj_info.pos[0]
-        #         pos_y = obse_obj_info.pos[1]
-        #         pos_z = obse_obj_info.pos[2]
-        #         pw_T_obj_obse_pos = [pos_x, pos_y, pos_z]
-        #         ori_x = obse_obj_info.ori[0]
-        #         ori_y = obse_obj_info.ori[1]
-        #         ori_z = obse_obj_info.ori[2]
-        #         ori_w = obse_obj_info.ori[3]
-        #         pw_T_obj_obse_ori = [ori_x, ori_y, ori_z, ori_w]
-        #         pw_T_obj_obse_3_3 = np.array(p.getMatrixFromQuaternion(pw_T_obj_obse_ori)).reshape(3, 3)
-        #         pw_T_obj_obse_3_4 = np.c_[pw_T_obj_obse_3_3, pw_T_obj_obse_pos]  # Add position to create 3x4 matrix
-        #         pw_T_obj_obse_4_4 = np.r_[pw_T_obj_obse_3_4, [[0, 0, 0, 1]]]  # Convert to 4x4 homogeneous matrix
-        #         time_row = np.zeros(pw_T_obj_obse_4_4.shape[1])
-        #         time_row[0] = _record_time_list[obse_pose_index]
-        #         pw_T_obj_obse_4_4_with_time = np.vstack((pw_T_obj_obse_4_4, time_row))
-        #         file_save_path = os.path.expanduser('~/catkin_ws/src/PBPF/scripts/results/'+str(REPEAT_TIME)+'/'+RUNNING_MODEL+'/')
-        #         file_name = str(obse_pose_index)+'_'+OBJECT_NAME_LIST[obj_index]+'_obse.txt'
-        #         np.savetxt(file_save_path + file_name, pw_T_obj_obse_4_4_with_time, fmt='%.6e', delimiter=' ')
-
-        # for GT_pose_index in range(GT_pose_num):
-        #     for obj_index in range(OBJECT_NUM):
-        #         pw_T_obj_GT_4_4 = _record_GT_pose_list[GT_pose_index][obj_index]
-        #         time_row = np.zeros(pw_T_obj_GT_4_4.shape[1])
-        #         time_row[0] = _record_time_list[GT_pose_index]
-        #         pw_T_obj_GT_4_4_with_time = np.vstack((pw_T_obj_GT_4_4, time_row))
-        #         file_save_path = os.path.expanduser('~/catkin_ws/src/PBPF/scripts/results/'+str(REPEAT_TIME)+'/'+RUNNING_MODEL+'/')
-        #         file_name = str(obse_pose_index)+'_'+OBJECT_NAME_LIST[obj_index]+'_GT.txt'
-        #         np.savetxt(file_save_path + file_name, pw_T_obj_GT_4_4_with_time, fmt='%.6e', delimiter=' ')
-
         for obj_index in range(OBJECT_NUM):
             # 70_scene1_rosbag3_repeat0_cracker_time_obse_err_ADD_PBPF_RGBD
             file_save_path = os.path.expanduser('~/catkin_ws/src/PBPF/scripts/results/')
@@ -1467,6 +1389,7 @@ if __name__ == '__main__':
         pub_PBPF_list.append(pub_PBPF)
     
     print("This is "+UPDATE_STYLE_FLAG+" update in scene"+TASK_FLAG)    
+
     # some parameters
     d_thresh = 0.005
     a_thresh = 0.01
@@ -1474,33 +1397,16 @@ if __name__ == '__main__':
     a_thresh_obse = math.pi * 2 / 3.0
     d_thresh_CV = 0.0002
     a_thresh_CV = 0.0010
-
-    flag_update_num_CV = 0
     
-    if run_alg_flag == "PBPF" and VERSION == "old" and USING_D_FLAG == False:
-        print("1: run_alg_flag: ",run_alg_flag,"; VERSION: ", VERSION, "; USING_D_FLAG: ", USING_D_FLAG)
-        BOSS_PF_UPDATE_INTERVAL_IN_REAL = 0.05 # original value = 0.16
-        PF_UPDATE_TIME_ONCE = BOSS_PF_UPDATE_INTERVAL_IN_REAL # rosbag slow down 0.125
-    # elif run_alg_flag == "PBPF" and VERSION == "multiray" and USING_D_FLAG == False:
-    elif RUNNING_MODEL == "PBPF_RGB":
-        print("2: RUNNING_MODEL:", RUNNING_MODEL)
-        BOSS_PF_UPDATE_INTERVAL_IN_REAL = 0.25 # original value = 0.16
-        PF_UPDATE_TIME_ONCE = BOSS_PF_UPDATE_INTERVAL_IN_REAL # 70 particles -> 2s
-    elif RUNNING_MODEL == "PBPF_RGBD" and RENDER_FLAG == 'vk':
-        print("3: RUNNING_MODEL (VK):", RUNNING_MODEL)
-        BOSS_PF_UPDATE_INTERVAL_IN_REAL = 0.25 # original value = 0.16 
-        PF_UPDATE_TIME_ONCE = BOSS_PF_UPDATE_INTERVAL_IN_REAL # 70 particles -> 35s
-    elif RUNNING_MODEL == "PBPF_RGBD" and RENDER_FLAG == 'pb':
-        print("3: RUNNING_MODEL (PB):", RUNNING_MODEL)
-        BOSS_PF_UPDATE_INTERVAL_IN_REAL = 0.25 # original value = 0.16 
-        PF_UPDATE_TIME_ONCE = BOSS_PF_UPDATE_INTERVAL_IN_REAL # 70 particles -> 35s
-    else: # run_alg_flag == "CVPF":
-        print("4: RUNNING_MODEL:", RUNNING_MODEL)
-        BOSS_PF_UPDATE_INTERVAL_IN_REAL = 0.25 # original value = 0.16
-        PF_UPDATE_TIME_ONCE = BOSS_PF_UPDATE_INTERVAL_IN_REAL # rosbag slow down 0.02 0.3*(1/0.02)=15s
-    PF_UPDATE_RATE = rospy.Rate(1.0/PF_UPDATE_TIME_ONCE)
-    print("PF_UPDATE_TIME_ONCE")
-    print(PF_UPDATE_TIME_ONCE)
+    if run_alg_flag == "PBPF":
+        BOSS_PF_UPDATE_INTERVAL_IN_REAL = 0.25 
+        print("Algorithm:",run_alg_flag,"; VERSION:", VERSION, "; RENDER MODEL:", RENDER_FLAG, "; RUNNING MODEL:", RUNNING_MODEL)
+    elif run_alg_flag == 'CVPF':
+        BOSS_PF_UPDATE_INTERVAL_IN_REAL = 0.025
+        while True:
+            print("Not yet implemented")
+    PF_UPDATE_RATE = rospy.Rate(1.0/BOSS_PF_UPDATE_INTERVAL_IN_REAL)
+    print("PF UPDATE TIME FREQUENCY:", BOSS_PF_UPDATE_INTERVAL_IN_REAL)
 
     # Motion model Noise
     POS_NOISE = 0.01 # original value = 0.005
