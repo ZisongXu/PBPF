@@ -760,10 +760,11 @@ def _vk_load_meshes():
     # load env objects meshes
     vk_other_id_list, vk_other_obj_info_list = _vk_load_env_objects_meshes()
     return vk_obj_id_list, vk_rob_link_id_list, vk_other_id_list, vk_other_obj_info_list
-    
-
-# "particle setting"
+ 
 def _vk_state_setting(vk_particle_cloud, pw_T_camVk_4_4, pybullet_env, par_robot_id):
+    """
+    particle setting
+    """
     global _vk_context
     vk_state_list = [0] * PARTICLE_NUM
     parNum_times_objNum = PARTICLE_NUM * OBJECT_NUM
@@ -798,7 +799,6 @@ def _vk_state_setting(vk_particle_cloud, pw_T_camVk_4_4, pybullet_env, par_robot
             ###########                                  x_pos, y_pos, z_pos,
             ###########                                  w_ori, x_ori, y_ori, z_ori) # w, x, y, z
             ########### _vk_context.add_state(vk_single_obj_state)
-
 
         # vk mark 
         ## add table/robot... in particle
@@ -838,7 +838,6 @@ def _vk_state_setting(vk_particle_cloud, pw_T_camVk_4_4, pybullet_env, par_robot
         # other objects
         vk_other_obj_number_ = len(_vk_other_id_list)
         
- 
         for vk_other_obj_index in range(vk_other_obj_number_):
             vk_other_obj_info = _vk_other_obj_info_list[vk_other_obj_index]
             vk_other_obj_name = vk_other_obj_info.obj_name
