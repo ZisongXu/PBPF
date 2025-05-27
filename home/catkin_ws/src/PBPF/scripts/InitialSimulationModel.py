@@ -210,9 +210,9 @@ class InitialSimulationModel():
             collision_detection_obj_id.append(fake_robot_id)
             
             if self.SIM_REAL_WORLD_FLAG == True:
-                table_pos_1 = [0.46, -0.01, 0.710]
+                table_pos_1 = [0.46, -0.01, 0.702]
                 table_ori_1 = pybullet_simulation_env.getQuaternionFromEuler([0,0,0])
-                table_id_1 = pybullet_simulation_env.loadURDF(os.path.expanduser("~/project/object/others/table.urdf"), table_pos_1, table_ori_1)
+                table_id_1 = pybullet_simulation_env.loadURDF(os.path.expanduser("~/project/object/others/table.urdf"), table_pos_1, table_ori_1, useFixedBase = 1)
 
                 barry_pos_1 = [-0.694, 0.443, 0.895]
                 barry_ori_1 = pybullet_simulation_env.getQuaternionFromEuler([0,math.pi/2,0])

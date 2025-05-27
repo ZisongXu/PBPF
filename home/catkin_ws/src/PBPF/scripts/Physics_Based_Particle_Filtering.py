@@ -162,6 +162,7 @@ elif RENDER_FLAG == 'pb':
 SIM_TIME_STEP = 1.0/100
 
 # ==============================================================================================================================
+
 # create parameters for recording data
 _record_PBPF_esti_pose_list = []
 _record_PBPF_par_pose_list = []
@@ -195,7 +196,9 @@ for obj_index in range(OBJECT_NUM):
 for par_index in range(PARTICLE_NUM):
     _boss_par_err_ADD_df = pd.DataFrame(columns=['step','time','pos_x','pos_y','pos_z','ori_x','ori_y','ori_z','ori_w','alg','obj','scene','particle_num','ray_type','obj_name','mass','friction'],index=[])
     _boss_par_err_ADD_df_list[par_index] = _boss_par_err_ADD_df
+
 # ==============================================================================================================================
+
 # some debug parameters
 Motion_model_time_consuming_list = []
 Render_depth_image_time_comsuming_list = []
@@ -228,6 +231,7 @@ _boss_time_consumption_df = pd.DataFrame(columns=['step','time',
 _time_record_index = 0
 
 # ==============================================================================================================================
+
 # vulkan
 from pathlib import Path
 import sys
@@ -235,7 +239,9 @@ sys.path.insert( 1, str(Path( __file__ ).parent.parent.absolute() / "bin") )
 ## Import module
 import vkdepth
 print("Launch Vkdepth successfully")
+
 # ==============================================================================================================================
+
 def compute_pos_err_bt_2_points(pos1, pos2):
     """
     compute the position difference between two objects
@@ -540,42 +546,15 @@ def process_esti_pose_from_rostopic(estimated_object_set):
         esti_pose_list.append(esti_pose)
     return esti_pose_list
 
-# get pose of the end-effector of the robot arm from joints of robot arm 
-def track_fk_sim_world():
-    p_track_fk_env = bc.BulletClient(connection_mode=p.DIRECT) # DIRECT,GUI_SERVER
-    p_track_fk_env.setAdditionalSearchPath(pybullet_data.getDataPath())
-    if SIM_REAL_WORLD_FLAG == True:
-        table_pos_1 = [0.46, -0.01, 0.710]
-    else:
-        table_pos_1 = [0, 0, 0]
-    track_fk_rob_id = p_track_fk_env.loadURDF(os.path.expanduser("~/project/data/bullet3-master/examples/pybullet/gym/pybullet_data/franka_panda/panda.urdf"),
-                                              [0, 0, 0.02+table_pos_1[2]],
-                                              [0, 0, 0, 1],
-                                              useFixedBase=1)
-    return p_track_fk_env, track_fk_rob_id
-
-def track_fk_world_rob_mv(p_sim, sim_rob_id, position):
-    num_joints = 9
-    for joint_index in range(num_joints):
-        if joint_index == 7 or joint_index == 8:
-            p_sim.resetJointState(sim_rob_id,
-                                  joint_index+2,
-                                  targetValue=position[joint_index])
-        else:
-            p_sim.resetJointState(sim_rob_id,
-                                  joint_index,
-                                  targetValue=position[joint_index])
-
-# get camera intrinsic params
 def _get_camera_intrinsic_params(camera_info_topic_name):
+    """
+    get camera intrinsic params
+    """
     camera_info = None
-
     def camera_info_callback(data):
         nonlocal camera_info
         camera_info = data
-
     rospy.Subscriber(camera_info_topic_name, CameraInfo, camera_info_callback)
-
     while camera_info is None and not rospy.is_shutdown():
         rospy.sleep(0.1)
 
@@ -625,6 +604,40 @@ def _compute_estimate_pos_of_object(particle_cloud):
         esti_objs_cloud.append(est_obj_pose)
     return esti_objs_cloud
 
+# ==============================================================================================================================
+
+def track_fk_sim_world():
+    """
+    get pose of the end-effector of the robot arm from joints of robot arm
+    """
+    p_track_fk_env = bc.BulletClient(connection_mode=p.DIRECT) # DIRECT, GUI_SERVER
+    p_track_fk_env.setAdditionalSearchPath(pybullet_data.getDataPath())
+    if SIM_REAL_WORLD_FLAG == True:
+        table_pos_1 = [0.46, -0.01, 0.702]
+    else:
+        table_pos_1 = [0, 0, 0]
+    track_fk_rob_id = p_track_fk_env.loadURDF(os.path.expanduser("~/project/data/bullet3-master/examples/pybullet/gym/pybullet_data/franka_panda/panda.urdf"),
+                                              [0, 0, 0.02+table_pos_1[2]+0.008],
+                                              [0, 0, 0, 1],
+                                              useFixedBase=1)
+    return p_track_fk_env, track_fk_rob_id
+
+def track_fk_world_rob_mv(p_sim, sim_rob_id, joint_states):
+    """
+    move the joint state of the robot in the fake env world 
+    """
+    num_joints = 9
+    for joint_index in range(num_joints):
+        if joint_index == 7 or joint_index == 8:
+            p_sim.resetJointState(sim_rob_id,
+                                  joint_index+2,
+                                  targetValue=joint_states[joint_index])
+        else:
+            p_sim.resetJointState(sim_rob_id,
+                                  joint_index,
+                                  targetValue=joint_states[joint_index])
+                                  
+# ==============================================================================================================================
 
 def _vk_config_setting():
     depth_img_height = RESOLUTION_DEPTH[0] # 480
@@ -642,47 +655,13 @@ def _vk_camera_setting(pw_T_camD_tf_4_4, camD_T_camVk_4_4):
     camD_T_camVk_4_4_ = copy.deepcopy(camD_T_camVk_4_4)
     pw_T_camVk_4_4_ = np.dot(pw_T_camD_tf_4_4_, camD_T_camVk_4_4_)
     
-    # # y
-    # trick_matrix1 = np.array([[ math.cos( math.pi/90.0), 0, math.sin( math.pi/90.0),-0.0],
-    #                           [                       0, 1,                       0,-0.0],
-    #                           [-math.sin( math.pi/90.0), 0, math.cos( math.pi/90.0), 0.0],
-    #                           [                       0, 0,                       0,   1]])
-    # pw_T_camVk_4_4_ = np.dot(pw_T_camVk_4_4_, trick_matrix1)
+    trick_matrix = np.array([[ 1, 0, 0,-0.010],
+                             [ 0, 1, 0,-0.010],
+                             [ 0, 0, 1,-0.00],
+                             [ 0, 0, 0, 1]])
+    pw_T_camVk_4_4_ = np.dot(pw_T_camVk_4_4_, trick_matrix)
 
-    # # z
-    # trick_matrix2 = np.array([[ math.cos( math.pi/90.0), math.sin( math.pi/90.0), 0, 0],
-    #                           [-math.sin( math.pi/90.0), math.cos( math.pi/90.0), 0, 0],
-    #                           [                       0,                       0, 1, 0],
-    #                           [                       0,                       0, 0,     1]])
-    # pw_T_camVk_4_4_ = np.dot(pw_T_camVk_4_4_, trick_matrix2)
 
-    # trick_matrix3 = np.array([[ 1, 0, 0,-0.005],
-    #                           [ 0, 1, 0,-0.015],
-    #                           [ 0, 0, 1, 0.025],
-    #                           [ 0, 0, 0,     1]])
-    # pw_T_camVk_4_4_ = np.dot(pw_T_camVk_4_4_, trick_matrix3)
-    
-    # trick_matrix3 = np.array([[ 1, 0, 0,-0.010],
-    #                           [ 0, 1, 0,-0.010],
-    #                           [ 0, 0, 1,-0.03],
-    #                           [ 0, 0, 0, 1]])
-    # pw_T_camVk_4_4_ = np.dot(pw_T_camVk_4_4_, trick_matrix3)
-    
-    trick_matrix3 = np.array([[ 1, 0, 0,-0.010],
-                              [ 0, 1, 0,-0.010],
-                              [ 0, 0, 1,-0.00],
-                              [ 0, 0, 0, 1]])
-    pw_T_camVk_4_4_ = np.dot(pw_T_camVk_4_4_, trick_matrix3)
-
-    
-    # # x
-    # trick_matrix4 = np.array([[ 1,                        0,                         0,     0],
-    #                           [ 0,  math.cos(-math.pi/100.0), math.sin(-math.pi/100.0),-0.03],
-    #                           [ 0, -math.sin(-math.pi/100.0), math.cos(-math.pi/100.0),-0.06],
-    #                           [ 0,                        0,                         0,     1]])
-    # pw_T_camVk_4_4_ = np.dot(pw_T_camVk_4_4_, trick_matrix4)
-
-    
     pw_T_camVk_pos = _get_position_from_matrix44(pw_T_camVk_4_4_)
     x_pos = pw_T_camVk_pos[0]
     y_pos = pw_T_camVk_pos[1]
