@@ -1419,17 +1419,13 @@ if __name__ == '__main__':
 
     # ============================================================================
 
-    # build an object of class "Ros_Listener"
     ROS_LISTENER = Ros_Listener()
     _tf_listener = tf.TransformListener()
-    
-    # ============================================================================
     
     create_scene = Create_Scene(OBJECT_NUM, ROBOT_NUM)
     _launch_camera = LaunchCamera(WIDTH_DEPTH, HEIGHT_DEPTH, FOV_V_DEPTH)
     
     pw_T_rob_sim_pose_list_alg = create_scene.initialize_robot()
-    print("Finish initializing robot")
     # Here, because we are using only one robot so we use [0]
     _pw_T_rob_sim_4_4 = pw_T_rob_sim_pose_list_alg[0].trans_matrix
     print("========================")
@@ -1448,9 +1444,7 @@ if __name__ == '__main__':
     print("========================")
     print("Finish initializing scene")
 
-
-    # cpu 
-    # create 70 "objects" of SingleENV class 
+    # cpu parallel
     _single_envs = create_particles(OBJECT_NUM, ROBOT_NUM, PARTICLE_NUM,
                                     pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg, 
                                     UPDATE_STYLE_FLAG, SIM_TIME_STEP, BOSS_PF_UPDATE_INTERVAL_IN_REAL)

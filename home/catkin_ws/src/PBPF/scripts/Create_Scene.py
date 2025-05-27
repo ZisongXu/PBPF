@@ -166,13 +166,11 @@ class Create_Scene():
             
     def initialize_robot(self):
         time.sleep(0.5)
-        # mark
         for rob_index in range(self.rob_num):
             if self.SIM_REAL_WORLD_FLAG == True:
                 self.table_pos_1[2] = self.table_pos_1[2]
             else:
                 self.table_pos_1[2] = 0
-            pw_T_rob_sim_pos = [0.0, 0.0, 0.026+self.table_pos_1[2]]
             pw_T_rob_sim_pos = [0.0, 0.0, 0.02+self.table_pos_1[2]]
             pw_T_rob_sim_ori = [0, 0, 0, 1]
             pw_T_rob_sim_3_3 = transformations.quaternion_matrix(pw_T_rob_sim_ori)

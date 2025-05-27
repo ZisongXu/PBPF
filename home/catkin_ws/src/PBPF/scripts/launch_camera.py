@@ -43,12 +43,6 @@ class LaunchCamera():
         self.compute_cam_pose_flag = 0
         
     def setCameraPicAndGetPic(self, p_world=0, tf_listener=0, pw_T_rob_sim_4_4=0):
-        
-        # width = 1
-        # height = 1
-        # rgbImg = 1
-        # depthImg = 1
-        # segImg = 1
 
         pw_T_camD_tf_4_4 = self.getCameraInPybulletWorldPose44(tf_listener, pw_T_rob_sim_4_4)
         camera_eye_position = pw_T_camD_tf_4_4[:3, 3]
@@ -142,7 +136,7 @@ class LaunchCamera():
                 while_time = while_time + 1
                 if while_time > 1000:
                     # print("In launch_camera.py: Can not find the pose of the camera!!!! You need to wait a while or try to debug")
-                    a = 1
+                    pass
                 try:
                     # (trans_camera, rot_camera) = tf_listener.lookupTransform('/zisong_robot', realsense_tf, rospy.Time(0))
                     (trans_camera, rot_camera) = tf_listener.lookupTransform('/panda_link0', realsense_tf, rospy.Time(0))
@@ -176,7 +170,7 @@ class LaunchCamera():
         else:
             return self.pw_T_camD_tf_4_4
 
-        return self.pw_T_camD_tf_4_4 # pw_T_camD_tf_4_4
+        return self.pw_T_camD_tf_4_4 
 
     def getFocalLength(self):
         F_x = 651.248474121094
