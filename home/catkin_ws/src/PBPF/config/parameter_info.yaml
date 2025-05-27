@@ -43,7 +43,6 @@ otob_name_list:
 - fish_can
 panda_robot_link_number: 11
 particle_num: 40
-pb_render_flag: false
 persp_to_ortho_flag: false
 pick_particle_rate: 0.0
 print_flag: false
@@ -52,6 +51,7 @@ process_model_flag: normal
 ray_tracing_type: multiray
 record_results_flag: false
 record_time_consumption_flag: false
+render_flag: vk
 robot_num: 1
 run_alg_flag: PBPF
 running_model: PBPF_RGBD
@@ -64,5 +64,4 @@ use_convolution_flag: false
 version: multiray
 visibility_compute_separate_flag: true
 visibility_compute_vk: true
-vk_render_flag: true
 width: 848
