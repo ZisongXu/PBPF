@@ -232,9 +232,8 @@ The above steps cover the entire process of running the code, but to ensure it r
 	```bash
 	object_name_list:
 	- cracker
-	- Parmesan
 	- soup
-	object_num: 3
+	object_num: 2
 	```
 
 7. Need to ensure that the names of the new objects are consistent.
