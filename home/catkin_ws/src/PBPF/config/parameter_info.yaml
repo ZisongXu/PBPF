@@ -22,6 +22,15 @@ ignore_edge_pixels: false
 locate_camera_flag: ar
 multiprocessing_flag: false
 nearVal: 0.03
+obj_mass_list:
+  Ketchup: 0.06
+  Mayo: 0.06
+  Milk: 0.04
+  Mustard: 0.05
+  Parmesan: 0.035
+  SaladDressing: 0.06
+  cracker: 0.45
+  soup: 0.35
 object_name_list:
 - cracker
 - soup
@@ -55,6 +64,9 @@ run_alg_flag: PBPF
 running_model: PBPF_RGBD
 show_particle_depth_image_to_point_cloud_flag: false
 show_ray: false
+sigma_obs_ang_for_init: 0.2
+sigma_obs_pos_for_init: 0.02
+sigma_obs_z_for_init: 0.02
 sim_real_world_flag: true
 task_flag: '1'
 test_initial_rendered_depth_image_flag: false

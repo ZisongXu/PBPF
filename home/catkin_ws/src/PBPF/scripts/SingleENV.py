@@ -76,13 +76,6 @@ class SingleENV(multiprocessing.Process):
         self.objects_list = ["None"] * self.object_num
         
         self.pf_update_interval_in_sim = self.pf_update_interval_in_real / self.sim_time_step
-        self.boss_sigma_obs_pos_init = 0.02
-        self.boss_sigma_obs_x = self.boss_sigma_obs_pos_init / math.sqrt(2)
-        self.boss_sigma_obs_y = self.boss_sigma_obs_pos_init / math.sqrt(2)
-        self.boss_sigma_obs_z = 0.02
-        self.boss_sigma_obs_ang_init = 0.2
-        
-        
         
         with open(os.path.expanduser("~/catkin_ws/src/PBPF/config/parameter_info.yaml"), 'r') as file:
             self.parameter_info = yaml.safe_load(file)
@@ -99,8 +92,17 @@ class SingleENV(multiprocessing.Process):
         self.MASS_marker = self.parameter_info['MASS_marker']
         self.FRICTION_marker = self.parameter_info['FRICTION_marker']
 
+        self.sigma_obs_pos_for_init = self.parameter_info['sigma_obs_pos_for_init']
+        self.sigma_obs_z_for_init = self.parameter_info['sigma_obs_z_for_init']
+        self.sigma_obs_ang_for_init = self.parameter_info['sigma_obs_ang_for_init']
+        self.sigma_obs_x_for_init = self.sigma_obs_pos_for_init / math.sqrt(2)
+        self.sigma_obs_y_for_init = self.sigma_obs_pos_for_init / math.sqrt(2)
+
+        self.obj_mass_dict = self.parameter_info['obj_mass_list']
+            
+
         self.MASS_MEAN_list = [0.5] * self.object_num
-        self.MASS_MEAN = 1.0 # 0.380
+        
         self.MASS_SIGMA_list = [0.5] * self.object_num
         self.MASS_SIGMA = 0.5 # 0.5
         self.MASS_MIN_VALUE = 0.05
@@ -109,15 +111,10 @@ class SingleENV(multiprocessing.Process):
         # self.FRICTION_SIGMA = 0.0
         self.RESTITUTION_MEAN = 0.9
         self.RESTITUTION_SIGMA = 0.2 # 0.2
-        # MASS_MEAN = 1.750 # 0.380
-        # MASS_SIGMA = 0.5
-        # FRICTION_MEAN = 0.1
-        # FRICTION_SIGMA = 0.3
-        # RESTITUTION_MEAN = 0.9
-        # RESTITUTION_SIGMA = 0.2
+        
 
 
-        # Motion Model Noise
+        # Motion Model Parameters
         self.MOTION_MODEL_POS_NOISE = 0.005 # original value = 0.005
         self.MOTION_MODEL_ANG_NOISE = 0.05 # original value = 0.05/0.5 
         # self.MOTION_MODEL_POS_NOISE = 0.0 # original value = 0.005
@@ -139,138 +136,10 @@ class SingleENV(multiprocessing.Process):
             self.MASS_NOISE = True
             self.FRICTION_NOISE = True
                 
-        # if self.FRICTION_marker == 'fA' or self.FRICTION_marker == 'fB' or self.FRICTION_marker == 'fC' or self.FRICTION_marker == 'fD' or self.FRICTION_marker == 'fE' or self.FRICTION_marker == 'fF' or self.FRICTION_marker == 'fG' or self.FRICTION_marker == 'fH':
-        #     self.MOTION_NOISE = False
-        #     self.MASS_NOISE = False
-        #     self.FRICTION_NOISE = False
-        # if self.FRICTION_marker == 'fAN' or self.FRICTION_marker == 'fBN' or self.FRICTION_marker == 'fCN' or self.FRICTION_marker == 'fDN' or self.FRICTION_marker == 'fEN' or self.FRICTION_marker == 'fFN' or self.FRICTION_marker == 'fGN' or self.FRICTION_marker == 'fHN':
-        #     self.MOTION_NOISE = True
-        #     self.MASS_NOISE = True
-        #     self.FRICTION_NOISE = False
-        # if self.FRICTION_marker == 'fANN' or self.FRICTION_marker == 'fBNN' or self.FRICTION_marker == 'fCNN' or self.FRICTION_marker == 'fDNN' or self.FRICTION_marker == 'fENN' or self.FRICTION_marker == 'fFNN' or self.FRICTION_marker == 'fGNN' or self.FRICTION_marker == 'fHNN':
-        #     self.MOTION_NOISE = True
-        #     self.MASS_NOISE = True
-        #     self.FRICTION_NOISE = True
-
-
-        # self.MASS_MEAN_list = [0.06] * self.object_num
-        # self.MASS_MEAN_list = np.array(self.MASS_MEAN_list)
-        # if self.MASS_marker == 'mA' or self.MASS_marker == 'mAN' or self.MASS_marker == 'mANN':
-        #     self.MASS_MEAN_list = [0.01] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * (0.5)
-        # elif self.MASS_marker == 'mB' or self.MASS_marker == 'mBN' or self.MASS_marker == 'mBNN':
-        #     self.MASS_MEAN_list = [0.5] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 1
-        # elif self.MASS_marker == 'mC' or self.MASS_marker == 'mCN' or self.MASS_marker == 'mCNN':
-        #     self.MASS_MEAN_list = [0.1] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 2
-        # elif self.MASS_marker == 'mD' or self.MASS_marker == 'mDN' or self.MASS_marker == 'mDNN':
-        #     self.MASS_MEAN_list = [0.5] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 3
-        # elif self.MASS_marker == 'mE' or self.MASS_marker == 'mEN' or self.MASS_marker == 'mENN':
-        #     self.MASS_MEAN_list = [1.0] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 4
-        # elif self.MASS_marker == 'mF' or self.MASS_marker == 'mFN' or self.MASS_marker == 'mFNN':
-        #     self.MASS_MEAN_list = [5.0] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 5
-        # elif self.MASS_marker == 'mG' or self.MASS_marker == 'mGN' or self.MASS_marker == 'mGNN':
-        #     self.MASS_MEAN_list = [10.0] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 10
-
-
-
-        # self.MASS_MEAN_list = [0.06, 0.05, 0.06] 
-        # self.MASS_SIGMA_list = [0.1, 0.1, 0.1] 
-        # self.MASS_SIGMA_list = np.array(self.MASS_SIGMA_list)
-        # if self.MASS_marker == 'mA' or self.MASS_marker == 'mAN' or self.MASS_marker == 'mANN':
-        #     self.MASS_SIGMA_list = self.MASS_SIGMA_list / 100.0
-        #     self.FRICTION_SIGMA = 0.3 / 100.0
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * (0.5)
-        # elif self.MASS_marker == 'mB' or self.MASS_marker == 'mBN' or self.MASS_marker == 'mBNN':
-        #     self.MASS_SIGMA_list = self.MASS_SIGMA_list / 1.0
-        #     self.FRICTION_SIGMA = 0.3 / 1.0
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 1
-        # elif self.MASS_marker == 'mC' or self.MASS_marker == 'mCN' or self.MASS_marker == 'mCNN':
-        #     self.MASS_SIGMA_list = self.MASS_SIGMA_list / 10.0
-        #     self.FRICTION_SIGMA = 0.3 / 10.0
-        #     # self.MASS_SIGMA_list = [0.5] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 2
-        # elif self.MASS_marker == 'mD' or self.MASS_marker == 'mDN' or self.MASS_marker == 'mDNN':
-        #     self.MASS_SIGMA_list = self.MASS_SIGMA_list * 2
-        #     self.FRICTION_SIGMA = 0.3 * 2
-        #     # self.MASS_SIGMA_list = [0.5] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 3
-        # elif self.MASS_marker == 'mE' or self.MASS_marker == 'mEN' or self.MASS_marker == 'mENN':
-        #     self.MASS_SIGMA_list = self.MASS_SIGMA_list * 5
-        #     self.FRICTION_SIGMA = 0.3 * 5
-        #     # self.MASS_SIGMA_list = [0.5] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 4
-        # elif self.MASS_marker == 'mF' or self.MASS_marker == 'mFN' or self.MASS_marker == 'mFNN':
-        #     self.MASS_SIGMA_list = self.MASS_SIGMA_list * 10
-        #     self.FRICTION_SIGMA = 0.3 * 10
-        #     # self.MASS_SIGMA_list = [0.5] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 5
-        # elif self.MASS_marker == 'mG' or self.MASS_marker == 'mGN' or self.MASS_marker == 'mGNN':
-        #     self.MASS_SIGMA_list = self.MASS_SIGMA_list * 100
-        #     self.FRICTION_SIGMA = 0.3 * 100
-            # self.MASS_SIGMA_list = [0.5] * self.object_num
-            # self.MASS_MEAN_list = self.MASS_MEAN_list * 10
 
         self.MASS_MEAN_list = [0.06] * self.object_num
-        # self.MASS_MEAN_list = np.array(self.MASS_MEAN_list)
-        # if self.MASS_marker == 'mA' or self.MASS_marker == 'mAN' or self.MASS_marker == 'mANN':
-        #     self.MOTION_MODEL_POS_NOISE = 0.000 # original value = 0.005
-        #     self.MOTION_MODEL_ANG_NOISE = 0.00 # original value = 0.05/0.5 
-        #     self.MOTION_NOISE = False
-        #     # self.MASS_MEAN_list = [0.01] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * (0.5)
-        # elif self.MASS_marker == 'mB' or self.MASS_marker == 'mBN' or self.MASS_marker == 'mBNN':
-        #     self.MOTION_MODEL_POS_NOISE = 0.005 # original value = 0.005
-        #     self.MOTION_MODEL_ANG_NOISE = 0.05 # original value = 0.05/0.5 
-        #     # self.MASS_MEAN_list = [0.5] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 1
-        # elif self.MASS_marker == 'mC' or self.MASS_marker == 'mCN' or self.MASS_marker == 'mCNN':
-        #     self.MOTION_MODEL_POS_NOISE = 0.005 * 2 # original value = 0.005
-        #     self.MOTION_MODEL_ANG_NOISE = 0.05 * 2 # original value = 0.05/0.5 
-        #     # self.MASS_MEAN_list = [0.1] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 2
-        # elif self.MASS_marker == 'mD' or self.MASS_marker == 'mDN' or self.MASS_marker == 'mDNN':
-        #     self.MOTION_MODEL_POS_NOISE = 0.005 * 4 # original value = 0.005
-        #     self.MOTION_MODEL_ANG_NOISE = 0.05 * 4 # original value = 0.05/0.5 
-        #     # self.MASS_MEAN_list = [0.5] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 3
-        # elif self.MASS_marker == 'mE' or self.MASS_marker == 'mEN' or self.MASS_marker == 'mENN':
-        #     self.MOTION_MODEL_POS_NOISE = 0.005 * 10 # original value = 0.005
-        #     self.MOTION_MODEL_ANG_NOISE = 0.05 * 10 # original value = 0.05/0.5 
-        #     # self.MASS_MEAN_list = [1.0] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 4
-        # elif self.MASS_marker == 'mF' or self.MASS_marker == 'mFN' or self.MASS_marker == 'mFNN':
-        #     self.MOTION_MODEL_POS_NOISE = 0.005 * 20 # original value = 0.005
-        #     self.MOTION_MODEL_ANG_NOISE = 0.05 * 20 # original value = 0.05/0.5 
-        #     # self.MASS_MEAN_list = [5.0] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 5
-        # elif self.MASS_marker == 'mG' or self.MASS_marker == 'mGN' or self.MASS_marker == 'mGNN':
-        #     self.MOTION_MODEL_POS_NOISE = 0.005 * 40 # original value = 0.005
-        #     self.MOTION_MODEL_ANG_NOISE = 0.05 * 40 # original value = 0.05/0.5 
-        #     # self.MASS_MEAN_list = [10.0] * self.object_num
-        #     # self.MASS_MEAN_list = self.MASS_MEAN_list * 10
 
-        # if self.FRICTION_marker == 'fA' or self.FRICTION_marker == 'fAN' or self.FRICTION_marker == 'fANN':
-        #     self.FRICTION_MEAN = 0.5
-        # elif self.FRICTION_marker == 'fB' or self.FRICTION_marker == 'fBN' or self.FRICTION_marker == 'fBNN':
-        #     self.FRICTION_MEAN = 0.66667
-        # elif self.FRICTION_marker == 'fC' or self.FRICTION_marker == 'fCN' or self.FRICTION_marker == 'fCNN':
-        #     self.FRICTION_MEAN = 0.83337
-        # elif self.FRICTION_marker == 'fD' or self.FRICTION_marker == 'fDN' or self.FRICTION_marker == 'fDNN':
-        #     self.FRICTION_MEAN = 1
-        # elif self.FRICTION_marker == 'fE' or self.FRICTION_marker == 'fEN' or self.FRICTION_marker == 'fENN':
-        #     self.FRICTION_MEAN = 0.1
-        # elif self.FRICTION_marker == 'fF' or self.FRICTION_marker == 'fFN' or self.FRICTION_marker == 'fFNN':
-        #     self.FRICTION_MEAN = 0.2
-        # elif self.FRICTION_marker == 'fG' or self.FRICTION_marker == 'fGN' or self.FRICTION_marker == 'fGNN':
-        #     self.FRICTION_MEAN = 0.3
-        # elif self.FRICTION_marker == 'fH' or self.FRICTION_marker == 'fHN' or self.FRICTION_marker == 'fHNN':
-        #     self.FRICTION_MEAN = 0.4
+
 
         if self.FRICTION_marker == 'fA' or self.FRICTION_marker == 'fAN' or self.FRICTION_marker == 'fANN':
             self.FRICTION_MEAN = 0.01 # 0.01
@@ -286,10 +155,7 @@ class SingleENV(multiprocessing.Process):
             self.FRICTION_MEAN = 0.75
         elif self.FRICTION_marker == 'fG' or self.FRICTION_marker == 'fGN' or self.FRICTION_marker == 'fGNN':
             self.FRICTION_MEAN = 1
-        # elif self.FRICTION_marker == 'fG' or self.FRICTION_marker == 'fGN' or self.FRICTION_marker == 'fGNN':
-        #     self.FRICTION_MEAN = 0.3
-        # elif self.FRICTION_marker == 'fH' or self.FRICTION_marker == 'fHN' or self.FRICTION_marker == 'fHNN':
-        #     self.FRICTION_MEAN = 0.4
+
 
 
         if self.MASS_NOISE == False:
@@ -351,23 +217,10 @@ class SingleENV(multiprocessing.Process):
                     self.MASS_MEAN_list[obj_num_index] = mass
                     mass_sigma = 0.1
                     self.MASS_SIGMA_list[obj_num_index] = mass_sigma
-            
-            # for index, name in enumerate(self.OBJECT_NAME_LIST):
-            #     if name == "cracker":
-            #         mass = 1.0
-            #         self.MASS_MEAN_list[index] = mass
-            #         self.MOTION_MODEL_ANG_NOISE = 0.05 # original value = 0.05/0.5
-            #     elif name == "Parmesan":
-            #         mass = 1.0
-            #         self.MASS_MEAN_list[index] = mass
-            #         self.MOTION_MODEL_ANG_NOISE = 0.05 # original value = 0.05/0.5
-            #     else:
-            #         mass = 1.5
-            #         self.MASS_MEAN_list[index] = mass
-            #         self.MOTION_MODEL_ANG_NOISE = 0.05 # original value = 0.05
 
 
-        # Observation Model
+
+        # Observation Model Parameters
         self.OBS_SIGMA_POS_FOR_WEIGHT = 0.1
         for name in self.OBJECT_NAME_LIST:
             if name == "cracker":
@@ -499,7 +352,9 @@ class SingleENV(multiprocessing.Process):
             obj_obse_name = self.pw_T_obj_obse_obj_list_alg[obj_index].obj_name
             if print_object_name_flag == obj_index:
                 print_object_name_flag = print_object_name_flag + 1
-            particle_pos, particle_ori = self.generate_random_pose(obj_obse_pos, obj_obse_ori)
+            particle_pos, particle_ori = self.generate_random_pose(obj_obse_pos, obj_obse_ori, 
+                                                                   self.sigma_obs_x_for_init, self.sigma_obs_y_for_init, self.sigma_obs_z_for_init,
+                                                                   self.sigma_obs_ang_for_init)
             gazebo_contain = ""
             if self.gazebo_flag == True:
                 gazebo_contain = "gazebo_"
@@ -530,7 +385,9 @@ class SingleENV(multiprocessing.Process):
                             if conter > 20:
                                 print("init more than 20 times")
                                 conter = 0
-                                particle_pos, particle_ori = self.generate_random_pose(obj_obse_pos, obj_obse_ori)
+                                particle_pos, particle_ori = self.generate_random_pose(obj_obse_pos, obj_obse_ori, 
+                                                                                       self.sigma_obs_x_for_init, self.sigma_obs_y_for_init, self.sigma_obs_z_for_init,
+                                                                                       self.sigma_obs_ang_for_init)
                             self.p_env.resetBasePositionAndOrientation(particle_no_visual_id, particle_pos, particle_ori)
                             flag = 1
                             break
@@ -694,17 +551,17 @@ class SingleENV(multiprocessing.Process):
 
         return [(str(par_index), weights_list)]
 
-    def generate_random_pose(self, pw_T_obj_obse_pos, pw_T_obj_obse_ori):
+    def generate_random_pose(self, pw_T_obj_obse_pos, pw_T_obj_obse_ori, noise_x, noise_y, noise_z, noise_ang):
         quat = pw_T_obj_obse_ori # x,y,z,w
         quat_QuatStyle = Quaternion(x=quat[0],y=quat[1],z=quat[2],w=quat[3]) # w,x,y,z
-        x = self.add_noise_to_init_par(pw_T_obj_obse_pos[0], self.boss_sigma_obs_x)
-        y = self.add_noise_to_init_par(pw_T_obj_obse_pos[1], self.boss_sigma_obs_y)
-        z = self.add_noise_to_init_par(pw_T_obj_obse_pos[2], self.boss_sigma_obs_z)
+        x = self.add_noise_to_init_par(pw_T_obj_obse_pos[0], noise_x)
+        y = self.add_noise_to_init_par(pw_T_obj_obse_pos[1], noise_y)
+        z = self.add_noise_to_init_par(pw_T_obj_obse_pos[2], noise_z)
         random_dir = random.uniform(0, 2*math.pi)
         z_axis = random.uniform(-1,1)
         x_axis = math.cos(random_dir) * math.sqrt(1 - z_axis ** 2)
         y_axis = math.sin(random_dir) * math.sqrt(1 - z_axis ** 2)
-        angle_noise = self.add_noise_to_init_par(0, self.boss_sigma_obs_ang_init)
+        angle_noise = self.add_noise_to_init_par(0, noise_ang)
         w_quat = math.cos(angle_noise/2.0)
         x_quat = math.sin(angle_noise/2.0) * x_axis
         y_quat = math.sin(angle_noise/2.0) * y_axis
@@ -848,8 +705,8 @@ class SingleENV(multiprocessing.Process):
 
     # change particle parameters
     def change_obj_parameters(self, obj_id, obj_index):
-        # mass_a = self.take_easy_gaussian_value(self.MASS_MEAN, self.MASS_SIGMA)
-        mass_a = self.take_easy_gaussian_value(self.MASS_MEAN_list[obj_index], self.MASS_SIGMA_list[obj_index])
+        obj_name = self.OBJECT_NAME_LIST[obj_index]
+        mass_a = self.take_easy_gaussian_value(self.obj_mass_dict[obj_name], self.MASS_SIGMA_list[obj_index])
         if mass_a < 0.001:
             mass_a = self.MASS_MIN_VALUE
         lateralFriction = self.take_easy_gaussian_value(self.FRICTION_MEAN, self.FRICTION_SIGMA)
