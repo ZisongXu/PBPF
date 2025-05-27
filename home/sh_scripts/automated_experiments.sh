@@ -1,7 +1,7 @@
 #!/bin/bash
 
 declare -a objectNames=("cracker") # "cracker" "Ketchup" "Mayo" "Milk" "Mustard" "Parmesan" "SaladDressing" "soup"
-declare -a sceneNames=("scene1") # "scene1" "scene2" "scene3" "scene4"
+declare -a sceneNames=("scene2") # "scene1" "scene2" "scene3" "scene4"
 declare -a particleNumbers=(40) # 40, 50, 70
 declare -a slowDownRates=(1)
 declare -a runAlgFlags=("PBPF")
