@@ -247,6 +247,7 @@ The above steps cover the entire process of running the code, but to ensure it r
 	- Function `_vk_load_target_objects_meshes` is used to update the target object in the rendered image.
 	- Function `_vk_load_robot_meshes` is used to update the robot in the rendered image.
 	- Function `_vk_load_env_objects_meshes` is used to update the environment in the rendered image.
+	Each function comes with corresponding examples to help you understan how it works.
 
 
 
