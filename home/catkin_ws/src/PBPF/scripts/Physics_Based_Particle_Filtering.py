@@ -236,8 +236,10 @@ sys.path.insert( 1, str(Path( __file__ ).parent.parent.absolute() / "bin") )
 import vkdepth
 print("Launch Vkdepth successfully")
 # ==============================================================================================================================
-# compute the position difference between two objects
 def compute_pos_err_bt_2_points(pos1, pos2):
+    """
+    compute the position difference between two objects
+    """
     x1=pos1[0]
     y1=pos1[1]
     z1=pos1[2]
@@ -249,8 +251,11 @@ def compute_pos_err_bt_2_points(pos1, pos2):
     z_d = z1-z2
     distance = math.sqrt(x_d ** 2 + y_d ** 2 + z_d ** 2)
     return distance
-# compute the rotation difference between two objects
+
 def compute_ang_err_bt_2_points(object1_ori, object2_ori):
+    """
+    compute the rotation difference between two objects
+    """
     #[x, y, z, w]
     obj1_ori = copy.deepcopy(object1_ori)
     obj2_ori = copy.deepcopy(object2_ori)
@@ -268,7 +273,10 @@ def compute_ang_err_bt_2_points(object1_ori, object2_ori):
     theta = abs(theta)
     return theta
 
-def compute_diff_bt_two_pose(obj_index, particle_cloud_pub, pw_T_obj_obse_pose_new):
+def find_closest_pose_metrics(obj_index, particle_cloud_pub, pw_T_obj_obse_pose_new):
+    """
+    Computes the minimum translational and rotational differences between a reference 6D pose and a list of candidate 6D poses.
+    """
     par_cloud_for_compute = particle_cloud_pub
     obj_obse_pos_new = pw_T_obj_obse_pose_new[0]
     obj_obse_ori_new = pw_T_obj_obse_pose_new[1]
@@ -299,8 +307,11 @@ def compute_diff_bt_two_pose(obj_index, particle_cloud_pub, pw_T_obj_obse_pose_n
 
     return minDis_obseCur_parOld, minAng_obseCur_parOld
 
-# compute the transformation matrix represent that the pose of object in the robot world
 def compute_transformation_matrix(a_pos, a_ori, b_pos, b_ori):
+    """
+    Computes the 4×4 homogeneous transformation matrix representing the pose of frame B
+    relative to frame A, given the poses of A and B in the world frame.
+    """
     # ow_T_a_3_3 = transformations.quaternion_matrix(a_ori)
     # ow_T_a_4_4 = rotation_4_4_to_transformation_4_4(ow_T_a_3_3,a_pos)
     # ow_T_b_3_3 = transformations.quaternion_matrix(b_ori)
@@ -319,25 +330,35 @@ def compute_transformation_matrix(a_pos, a_ori, b_pos, b_ori):
     a_T_b_4_4 = np.dot(a_T_ow_4_4,ow_T_b_4_4)
     return a_T_b_4_4
 
-# get pose of item
 def get_item_pos(pybullet_env, item_id):
+    """
+    get pose of item in given PyBullet Env
+    """
     item_info = pybullet_env.getBasePositionAndOrientation(item_id)
     return item_info[0],item_info[1]
-# random values generated from a Gaussian distribution
+
 def take_easy_gaussian_value(mean, sigma):
+    """
+    random values generated from a Gaussian distribution
+    """
     normal = random.normalvariate(mean, sigma)
     return normal
 
-# make sure all angles all between -pi and +pi
 def angle_correction(angle):
+    """
+    make sure all angles all between -pi and +pi
+    """
     if math.pi <= angle <= (3.0 * math.pi):
         angle = angle - 2 * math.pi
     elif -(3.0 * math.pi) <= angle <= -math.pi:
         angle = angle + 2 * math.pi
     angle = abs(angle)
     return angle
-# make sure all quaternions all between -pi and +pi
+ 
 def quaternion_correction(quaternion): # x,y,z,w
+    """
+    make sure all quaternions all between -pi and +pi
+    """
     new_quat = Quaternion(x=quaternion[0], y=quaternion[1], z=quaternion[2], w=quaternion[3]) # w,x,y,z
     cos_theta_over_2 = new_quat.w
     sin_theta_over_2 = math.sqrt(new_quat.x ** 2 + new_quat.y ** 2 + new_quat.z ** 2)
@@ -347,28 +368,32 @@ def quaternion_correction(quaternion): # x,y,z,w
         theta = theta - 2.0*math.pi
     while theta <= -math.pi:
         theta = theta + 2.0*math.pi
-    new_quaternion = [math.sin(theta/2.0)*(new_quat.x/sin_theta_over_2), math.sin(theta/2.0)*(new_quat.y/sin_theta_over_2), math.sin(theta/2.0)*(new_quat.z/sin_theta_over_2), math.cos(theta/2.0)]
-    #if theta >= math.pi or theta <= -math.pi:
-    #    new_quaternion = [-quaternion[0], -quaternion[1], -quaternion[2], -quaternion[3]]
-    #    return new_quaternion
-    #return quaternion # x,y,z,w
-    return new_quaternion
+    new_quaternion = [math.sin(theta/2.0)*(new_quat.x/sin_theta_over_2), 
+                      math.sin(theta/2.0)*(new_quat.y/sin_theta_over_2), 
+                      math.sin(theta/2.0)*(new_quat.z/sin_theta_over_2), 
+                      math.cos(theta/2.0)]
+    return new_quaternion # x,y,z,w
 
 def _get_position_from_matrix44(a_T_b_4_4):
+    """
+    get position from transformation matrix
+    """
     x = a_T_b_4_4[0][3]
     y = a_T_b_4_4[1][3]
     z = a_T_b_4_4[2][3]
     position = [x, y, z]
     return position
 
-# get quaternion from matrix
 def _get_quaternion_from_matrix(a_T_b_4_4):
+    """
+    get quaternion matrix (4×4) from transformation matrix
+    """
     rot_matrix = a_T_b_4_4[:3, :3]
     rotation = R.from_matrix(rot_matrix)
     quaternion = rotation.as_quat()
     return quaternion
 
-#def publish_ray_trace_info(particle_cloud_pub):
+# def publish_ray_trace_info(particle_cloud_pub):
 #    par_pose_list = list(range(PARTICLE_NUM))
 #    for par_index in range(PARTICLE_NUM):
 #        par_pose = particle_pose()
@@ -383,7 +408,6 @@ def _get_quaternion_from_matrix(a_T_b_4_4):
 #            obj_pose_list.append(obj_pose)
 #        par_pose.objects = obj_pose_list
 #        par_pose_list[par_index] = par_pose
-#        
 #    par_list.particles = par_pose_list
 #    pub_ray_trace.publish(par_list)
 
@@ -407,10 +431,6 @@ def _publish_par_pose_info(particle_cloud_pub):
                 obj_scene = obj_info.par_name+"_scene"+str(TASK_FLAG)
                 _record_t = time.time()
                 # x, y, z ,w
-                # need to soup
-                # if obj_index == 1:
-                #     _boss_par_err_ADD_df_list[par_index].loc[_par_panda_step] = [_par_panda_step, _record_t - _record_t_begin, obj_info.pos[0], obj_info.pos[1], obj_info.pos[2], obj_info.ori[0], obj_info.ori[1], obj_info.ori[2], obj_info.ori[3], RUNNING_MODEL, obj_name, scene, PARTICLE_NUM, VERSION, obj_name+'2', MASS_marker, FRICTION_marker]
-                # else:
                 _boss_par_err_ADD_df_list[par_index].loc[_par_panda_step] = [_par_panda_step, _record_t - _record_t_begin, obj_info.pos[0], obj_info.pos[1], obj_info.pos[2], obj_info.ori[0], obj_info.ori[1], obj_info.ori[2], obj_info.ori[3], RUNNING_MODEL, obj_name, scene, PARTICLE_NUM, VERSION, obj_name, MASS_marker, FRICTION_marker]
                 _par_panda_step = _par_panda_step + 1
     
@@ -484,18 +504,12 @@ def _publish_esti_pose_info(estimated_object_set):
             obj_name = esti_obj_info.obj_name
             _record_t = time.time()
             # x, y, z ,w
-            # need to soup
-            # if obj_index == 1:
-            #     _boss_PBPF_err_ADD_df_list[obj_index].loc[_PBPF_panda_step] = [_PBPF_panda_step, _record_t - _record_t_begin, esti_obj_info.pos[0], esti_obj_info.pos[1], esti_obj_info.pos[2], esti_obj_info.ori[0], esti_obj_info.ori[1], esti_obj_info.ori[2], esti_obj_info.ori[3], RUNNING_MODEL, obj, scene, PARTICLE_NUM, VERSION, obj_name+'2', MASS_marker, FRICTION_marker]                                    
-            # else:
             _boss_PBPF_err_ADD_df_list[obj_index].loc[_PBPF_panda_step] = [_PBPF_panda_step, _record_t - _record_t_begin, esti_obj_info.pos[0], esti_obj_info.pos[1], esti_obj_info.pos[2], esti_obj_info.ori[0], esti_obj_info.ori[1], esti_obj_info.ori[2], esti_obj_info.ori[3], RUNNING_MODEL, obj, scene, PARTICLE_NUM, VERSION, obj_name, MASS_marker, FRICTION_marker]                                    
 
-    
     _PBPF_panda_step = _PBPF_panda_step + 1
 
     esti_obj_list.objects = esti_pose_list 
     pub_esti_pose.publish(esti_obj_list)
-
 
     if RECORD_RESULTS_FLAG == True:
         _record_PBPF_esti_pose_list.append(estimated_object_set)
@@ -511,7 +525,6 @@ def _publish_esti_pose_info(estimated_object_set):
         pose_PBPF.pose.orientation.w = estimated_object_set[obj_index].ori[3]
         pub_PBPF_list[obj_index].publish(pose_PBPF)
 
-# need to change
 def process_esti_pose_from_rostopic(estimated_object_set):
     esti_pose_list = []
     for obj_index in range(OBJECT_NUM):
@@ -523,55 +536,9 @@ def process_esti_pose_from_rostopic(estimated_object_set):
         esti_obj_ori_y = esti_obj_info.ori[1]
         esti_obj_ori_z = esti_obj_info.ori[2]
         esti_obj_ori_w = esti_obj_info.ori[3]
-        esti_pose = [[esti_obj_pos_x, esti_obj_pos_y, esti_obj_pos_z], [esti_obj_ori_x, esti_obj_ori_y, esti_obj_ori_z, esti_obj_ori_w]]
+        esti_pose = [[esti_obj_pos_x, esti_obj_pos_y, esti_obj_pos_z], [esti_obj_ori_x, esti_obj_ori_y, esti_obj_ori_z, esti_obj_ori_w]] # x, y, z, w
         esti_pose_list.append(esti_pose)
     return esti_pose_list
-
-
-def generate_point_for_ray(pw_T_c_pos, pw_T_parC_4_4, obj_index):
-    vector_list = [[1,1,1], [1,1,-1], [1,-1,1], [1,-1,-1],
-                   [-1,1,1], [-1,1,-1], [-1,-1,1], [-1,-1,-1],
-                   [1,0,0], [-1,0,0], [0,1,0], [0,-1,0], [0,0,1], [0,0,-1],
-                   [1,0.5,0.5], [1,0.5,-0.5], [1,-0.5,0.5], [1,-0.5,-0.5],
-                   [-1,0.5,0.5], [-1,0.5,-0.5], [-1,-0.5,0.5], [-1,-0.5,-0.5],
-                   [0.5,1,0.5], [0.5,1,-0.5], [-0.5,1,0.5], [-0.5,1,-0.5],
-                   [0.5,-1,0.5], [0.5,-1,-0.5], [-0.5,-1,0.5], [-0.5,-1,-0.5],
-                   [0.5,0.5,1], [0.5,-0.5,1], [-0.5,0.5,1], [-0.5,-0.5,1],
-                   [0.5,0.5,-1], [0.5,-0.5,-1], [-0.5,0.5,-1], [-0.5,-0.5,-1]]
-    r = math.sqrt(2)
-    if OBJECT_NAME_LIST[obj_index] == "soup":
-        vector_list = [[0,0,1], [0,0,-1],
-                       [r,0,1], [0,r,1], [-r,0,1], [0,-r,1], [r,r,1], [r,-r,1], [-r,r,1], [-r,-r,1],
-                       [r,0,0.5], [0,r,0.5], [-r,0,0.5], [0,-r,0.5], [r,r,0.5], [r,-r,0.5], [-r,r,0.5], [-r,-r,0.5],
-                       [r,0,0], [0,r,0], [-r,0,0], [0,-r,0], [r,r,0], [r,-r,0], [-r,r,0], [-r,-r,0],
-                       [r,0,-0.5], [0,r,-0.5], [-r,0,-0.5], [0,-r,-0.5], [r,r,-0.5], [r,-r,-0.5], [-r,r,-0.5], [-r,-r,-0.5],
-                       [r,0,-1], [0,r,-1], [-r,0,-1], [0,-r,-1], [r,r,-1], [r,-r,-1], [-r,r,-1], [-r,-r,-1]]
-        # vector_list = [[0,0,1], [0,0,-1],
-        #                [2,2,1], [2,-2,1], [-2,2,1], [-2,-2,1], [r,r,1], [r,-r,1], [-r,r,1], [-r,-r,1],
-        #                [r,0,0.5], [0,r,0.5], [-r,0,0.5], [0,-r,0.5], [r,r,0.5], [r,-r,0.5], [-r,r,0.5], [-r,-r,0.5],
-        #                [r,0,0], [0,r,0], [-r,0,0], [0,-r,0], [r,r,0], [r,-r,0], [-r,r,0], [-r,-r,0],
-        #                [r,0,-0.5], [0,r,-0.5], [-r,0,-0.5], [0,-r,-0.5], [r,r,-0.5], [r,-r,-0.5], [-r,r,-0.5], [-r,-r,-0.5],
-        #                [2,2,-1], [2,-2,-1], [-2,2,-1], [-2,-2,-1], [r,r,-1], [r,-r,-1], [-r,r,-1], [-r,-r,-1]]
-    point_list = []
-    point_pos_list = []
-    for index in range(len(vector_list)):
-        parC_T_p_x_new = vector_list[index][0] * x_w_list[obj_index]/2 # 0.042
-        parC_T_p_y_new = vector_list[index][1] * y_l_list[obj_index]/2 # 0.061
-        parC_T_p_z_new = vector_list[index][2] * z_h_list[obj_index]/2 # 0.145
-        parC_T_p_pos = [parC_T_p_x_new, parC_T_p_y_new, parC_T_p_z_new]
-        parC_T_p_ori = [0, 0, 0, 1] # x, y, z, w
-        # parC_T_p_3_3 = transformations.quaternion_matrix(parC_T_p_ori)
-        # parC_T_p_4_4 = rotation_4_4_to_transformation_4_4(parC_T_p_3_3, parC_T_p_pos)
-        parC_T_p_3_3 = np.array(p.getMatrixFromQuaternion(parC_T_p_ori)).reshape(3, 3)
-        parC_T_p_3_4 = np.c_[parC_T_p_3_3, parC_T_p_pos]  # Add position to create 3x4 matrix
-        parC_T_p_4_4 = np.r_[parC_T_p_3_4, [[0, 0, 0, 1]]]  # Convert to 4x4 homogeneous matrix
-        pw_T_p_4_4 = np.dot(pw_T_parC_4_4, parC_T_p_4_4)
-        pw_T_p_pos = [pw_T_p_4_4[0][3], pw_T_p_4_4[1][3], pw_T_p_4_4[2][3]]
-        pw_T_p_ori = transformations.quaternion_from_matrix(pw_T_p_4_4)
-        pw_T_p_pose = Center_T_Point_for_Ray(pw_T_p_pos, pw_T_p_ori, parC_T_p_4_4, index)
-        point_list.append(pw_T_p_pose)
-        point_pos_list.append(pw_T_p_pos)
-    return point_list, point_pos_list
 
 # get pose of the end-effector of the robot arm from joints of robot arm 
 def track_fk_sim_world():
@@ -2140,7 +2107,7 @@ if __name__ == '__main__':
             # ang_obseCur_estiOld = compute_ang_err_bt_2_points(pw_T_obj_obse_ori, pw_T_esti_obj_pose_old[1])
             pw_T_obj_obse_pose_new = [pw_T_obj_obse_pos, pw_T_obj_obse_ori]
 
-            minDis_obseCur_parOld, minAng_obseCur_parOld = compute_diff_bt_two_pose(obj_index, _particle_cloud_pub, pw_T_obj_obse_pose_new)            
+            minDis_obseCur_parOld, minAng_obseCur_parOld = find_closest_pose_metrics(obj_index, _particle_cloud_pub, pw_T_obj_obse_pose_new)            
 
             if run_alg_flag == "PBPF":
                 # if dis_obseCur_estiOld > dis_std_list[obj_index] or ang_obseCur_estiOld > ang_std_list[obj_index]
