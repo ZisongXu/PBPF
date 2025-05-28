@@ -107,9 +107,6 @@ simRobot_touch_par_flag = 0
 OBJECT_NUM = parameter_info['object_num']
 ROBOT_NUM = parameter_info['robot_num']
 
-OBJS_ARE_NOT_TOUCHING_TARGET_OBJS_NUM = parameter_info['objs_are_not_touching_target_objs_num']
-OBJS_TOUCHING_TARGET_OBJS_NUM = parameter_info['objs_touching_target_objs_num']
-
 SIM_REAL_WORLD_FLAG = parameter_info['sim_real_world_flag']
 
 LOCATE_CAMERA_FLAG = parameter_info['locate_camera_flag']

@@ -497,8 +497,6 @@ while reset_flag == True:
         task_flag = parameter_info['task_flag'] # parameter_info['task_flag']/ 4: slope
         dope_flag = parameter_info['dope_flag']
 
-        OBJS_ARE_NOT_TOUCHING_TARGET_OBJS_NUM = parameter_info['objs_are_not_touching_target_objs_num']
-        OBJS_TOUCHING_TARGET_OBJS_NUM = parameter_info['objs_touching_target_objs_num']
 
         visual_world = Visualisation_World(object_num, robot_num, particle_num)
         trans_ob_list, rot_ob_list, trans_gt, rot_gt = visual_world.initialize_visual_world_pybullet_env(task_flag)
@@ -736,40 +734,7 @@ while reset_flag == True:
                     visual_world.display_object_in_visual_model(p_visual, pw_T_target_obj_obse_pose_lsit_param[obj_index])
                     # print(pw_T_obj_obse_pos)
             
-            # display other objects
-            # update other objects touching
-            for obj_index in range(OBJS_TOUCHING_TARGET_OBJS_NUM):
-                opti_T_rob_opti_pos = visual_world.ros_listener.listen_2_robot_pose()[0]
-                opti_T_rob_opti_ori = visual_world.ros_listener.listen_2_robot_pose()[1]
-                base_of_cheezit_pos = visual_world.ros_listener.listen_2_object_pose("base")[0]
-                base_of_cheezit_ori = visual_world.ros_listener.listen_2_object_pose("base")[1]                
-                robot_T_base = compute_transformation_matrix(opti_T_rob_opti_pos, opti_T_rob_opti_ori, base_of_cheezit_pos, base_of_cheezit_ori)
-                pw_T_base = np.dot(pw_T_rob_sim_4_4, robot_T_base)
-                pw_T_base_pos = [pw_T_base[0][3], pw_T_base[1][3], pw_T_base[2][3]]
-                pw_T_base_ori = transformations.quaternion_from_matrix(pw_T_base)
-                # update pose
-                pw_T_other_obj_opti_pose_list_param[obj_index].pos = pw_T_base_pos
-                pw_T_other_obj_opti_pose_list_param[obj_index].ori = pw_T_base_ori
-                visual_world.display_object_in_visual_model(p_visual, pw_T_other_obj_opti_pose_list_param[obj_index])
-
-            # update other objects not touching
-            for obj_index in range(OBJS_ARE_NOT_TOUCHING_TARGET_OBJS_NUM):
-                opti_T_rob_opti_pos = visual_world.ros_listener.listen_2_robot_pose()[0]
-                opti_T_rob_opti_ori = visual_world.ros_listener.listen_2_robot_pose()[1]
-                base_of_cheezit_pos = visual_world.ros_listener.listen_2_object_pose("pringles")[0]
-                base_of_cheezit_ori = visual_world.ros_listener.listen_2_object_pose("pringles")[1]
-                robot_T_base = compute_transformation_matrix(opti_T_rob_opti_pos, opti_T_rob_opti_ori, base_of_cheezit_pos, base_of_cheezit_ori)
-                pw_T_base = np.dot(pw_T_rob_sim_4_4, robot_T_base)
-                pw_T_base_pos = [pw_T_base[0][3], pw_T_base[1][3], pw_T_base[2][3]]
-                pw_T_base_ori = transformations.quaternion_from_matrix(pw_T_base)
-                print("pringles:")
-                print(pw_T_base_pos)
-                print(pw_T_base_ori)
-                print("===============================")
-                # update pose
-                pw_T_objs_not_touching_targetObjs_list_param[obj_index].pos = pw_T_base_pos
-                pw_T_objs_not_touching_targetObjs_list_param[obj_index].ori = pw_T_base_ori
-                visual_world.display_object_in_visual_model(p_visual, pw_T_objs_not_touching_targetObjs_list_param[obj_index])
+    
             
             # display particles
             # if display_par_flag == True:

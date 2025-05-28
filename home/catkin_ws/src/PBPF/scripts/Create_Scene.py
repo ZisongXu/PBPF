@@ -209,8 +209,7 @@ class Create_Scene():
                 self.trans_gt_list.append(trans_gt)
                 self.rot_gt_list.append(rot_gt)
                 
-            for obj_index in range(self.OBJS_ARE_NOT_TOUCHING_TARGET_OBJS_NUM):
-                self.pw_T_objs_not_touching_targetObjs_list = []
+            self.pw_T_objs_not_touching_targetObjs_list = []
                 
             return self.pw_T_target_obj_opti_pose_lsit, self.pw_T_objs_not_touching_targetObjs_list, trans_gt, rot_gt
 

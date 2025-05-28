@@ -83,8 +83,6 @@ class SingleENV(multiprocessing.Process):
         self.task_flag = self.parameter_info['task_flag']
         self.SIM_REAL_WORLD_FLAG = self.parameter_info['sim_real_world_flag']
         self.SHOW_RAY = self.parameter_info['show_ray'] 
-        self.OBJS_ARE_NOT_TOUCHING_TARGET_OBJS_NUM = self.parameter_info['objs_are_not_touching_target_objs_num']
-        self.OBJS_TOUCHING_TARGET_OBJS_NUM = self.parameter_info['objs_touching_target_objs_num']
         self.OBJECT_NAME_LIST = self.parameter_info['object_name_list']
         self.OBJECT_NUM = self.parameter_info['object_num']
         
@@ -136,7 +134,7 @@ class SingleENV(multiprocessing.Process):
         # Observation Model Parameters
         self.OBJ_SIGMA_POS_FOR_OBS_WEIGHT_DICT = self.parameter_info['obj_sigma_pos_for_obs_weight_dict']
         self.OBJ_SIGMA_ANG_FOR_OBS_WEIGHT_DICT = self.parameter_info['obj_sigma_ang_for_obs_weight_dict']
-        
+
         # ============================================================================
 
     def run(self):

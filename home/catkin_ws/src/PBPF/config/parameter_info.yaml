@@ -105,8 +105,6 @@ object_name_list:
 - cracker
 - soup
 object_num: 2
-objs_are_not_touching_target_objs_num: 0
-objs_touching_target_objs_num: 0
 optitrack_flag: true
 ortho_to_persp_flag: true
 other_base_obj_num: 0
