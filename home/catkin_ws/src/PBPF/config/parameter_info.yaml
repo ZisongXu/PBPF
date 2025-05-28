@@ -119,6 +119,7 @@ otob_name_list:
 panda_robot_link_number: 11
 particle_num: 50
 persp_to_ortho_flag: false
+physics_simulation: pybullet
 pick_particle_rate: 0.0
 print_flag: false
 print_score_flag: false
@@ -143,4 +144,3 @@ use_convolution_flag: false
 version: multiray
 visibility_compute_separate_flag: true
 visibility_compute_vk: true
-physics_simulation: pybullet

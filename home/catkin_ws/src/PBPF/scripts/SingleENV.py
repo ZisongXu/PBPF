@@ -170,6 +170,8 @@ class SingleENV(multiprocessing.Process):
             self.p_env = bc.BulletClient(connection_mode=p.DIRECT) # DIRECT,GUI_SERVER
         if self.update_style_flag == "time":
             self.p_env.setTimeStep(self.sim_time_step)
+        else:
+            pass # 
         self.p_env.resetDebugVisualizerCamera(cameraDistance=1., cameraYaw=90, cameraPitch=-50, cameraTargetPosition=[0.1,0.15,0.35])  
         self.p_env.setAdditionalSearchPath(pybullet_data.getDataPath())
         self.p_env.setGravity(0, 0, -9.81)
@@ -641,25 +643,18 @@ class SingleENV(multiprocessing.Process):
                                   rollingFriction = rollingFriction, 
                                   restitution = restitution)
 
-        if self.task_flag == "4": # slope
-            self.p_env.changeDynamics(self.board_id_4, 0, 
-                                    lateralFriction = lateralFriction, 
-                                    spinningFriction = spinningFriction, 
-                                    rollingFriction = 0.001, 
-                                    restitution = restitution)
-        else:
-            self.p_env.changeDynamics(self.table_id_1, 0, 
-                                    lateralFriction = lateralFriction, 
-                                    spinningFriction = spinningFriction, 
-                                    rollingFriction = 0.001, 
-                                    restitution = restitution)
+        self.p_env.changeDynamics(self.table_id_1, 0, 
+                                lateralFriction = lateralFriction, 
+                                spinningFriction = spinningFriction, 
+                                rollingFriction = self.OBJ_FRICTION_MIN_MEAN_DICT[obj_name], 
+                                restitution = restitution)
         self.p_env.changeDynamics(self.robot_id, 10, 
                                 lateralFriction = lateralFriction, 
                                 spinningFriction = spinningFriction, 
-                                rollingFriction = 0.001, 
+                                rollingFriction = self.OBJ_FRICTION_MIN_MEAN_DICT[obj_name], 
                                 restitution = restitution)
         self.p_env.changeDynamics(self.robot_id, 11, 
                                 lateralFriction = lateralFriction, 
                                 spinningFriction = spinningFriction, 
-                                rollingFriction = 0.001, 
+                                rollingFriction = self.OBJ_FRICTION_MIN_MEAN_DICT[obj_name], 
                                 restitution = restitution)
