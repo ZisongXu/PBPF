@@ -21,11 +21,11 @@ import tf
 import tf.transformations as transformations
 from visualization_msgs.msg import Marker
 #pybullet
-from pyquaternion import Quaternion
 import pybullet as p
-import time
 import pybullet_data
 from pybullet_utils import bullet_client as bc
+import time
+from pyquaternion import Quaternion
 import numpy as np
 import math
 import random
@@ -35,13 +35,13 @@ import signal
 import sys
 import multiprocessing
 import matplotlib.pyplot as plt
+import yaml
 import pandas as pd
 #from sksurgerycore.algorithms.averagequaternions import average_quaternions
 from quaternion_averaging import weightedAverageQuaternions
 from Particle import Particle
 from Object_Pose import Object_Pose
-import yaml
-
+from PhysicsEnv import PhysicsEnv
 # - Parmesan
 # - Milk
 # - SaladDressing
@@ -53,34 +53,31 @@ import yaml
 
 #Class of initialize the simulation model
 class SingleENV(multiprocessing.Process):
-    def __init__(self, object_num, robot_num, particle_num,
+    def __init__(self, physics_env: PhysicsEnv,
                  pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg,
-                 update_style_flag, sim_time_step, pf_update_interval_in_real, 
                  result_dict, daemon=True):
         super().__init__(daemon=daemon)
+
+        self.env = physics_env
+        self.pw_T_rob_sim_pose_list_alg = pw_T_rob_sim_pose_list_alg
+        self.pw_T_obj_obse_obj_list_alg = pw_T_obj_obse_obj_list_alg
+
         self.queue = multiprocessing.Queue()
         self.lock = multiprocessing.Lock()
         self.result = result_dict
 
-        self.object_num = object_num
-        self.robot_num = robot_num
-        self.particle_num = particle_num
-        self.pw_T_rob_sim_pose_list_alg = pw_T_rob_sim_pose_list_alg
-        self.pw_T_obj_obse_obj_list_alg = pw_T_obj_obse_obj_list_alg
-        self.update_style_flag = update_style_flag
-        self.sim_time_step = sim_time_step
-        self.pf_update_interval_in_real = pf_update_interval_in_real
-
-        self.collision_detection_obj_id_collection = []
-        self.particle_objects_id_collection = ["None"] * self.object_num
-        self.objects_list = ["None"] * self.object_num
-        
-        self.pf_update_interval_in_sim = self.pf_update_interval_in_real / self.sim_time_step
-        
         with open(os.path.expanduser("~/catkin_ws/src/PBPF/config/parameter_info.yaml"), 'r') as file:
             self.parameter_info = yaml.safe_load(file)
 
+        self.RUN_ALG_FLAG = self.parameter_info['run_alg_flag']
+
         self.PHYSICS_SIMULATION = self.parameter_info['physics_simulation']
+        self.update_style_flag = self.parameter_info['update_style_flag']
+        self.SIM_TIME_STEP = self.parameter_info['sim_time_step']
+        self.PF_UPDATE_FREQUENCY = self.parameter_info['pf_update_frequency']
+    
+        self.PF_UPDATE_INTERVAL_IN_SIM = self.PF_UPDATE_FREQUENCY[self.RUN_ALG_FLAG] / self.SIM_TIME_STEP
+
         self.gazebo_flag = self.parameter_info['gazebo_flag']
         self.task_flag = self.parameter_info['task_flag']
         self.SIM_REAL_WORLD_FLAG = self.parameter_info['sim_real_world_flag']
@@ -145,12 +142,9 @@ class SingleENV(multiprocessing.Process):
         # if the seed is not re-generated in each process, 
         # each process will generate the same noisy trajectory.
         np.random.seed()
-        if self.PHYSICS_SIMULATION == 'pybullet':
-            self.init_pybullet()
-        elif self.PHYSICS_SIMULATION == 'mujoco':
-            pass
-        else:
-            pass
+        
+        self.env.init_env(self.pw_T_rob_sim_pose_list_alg, self.pw_T_obj_obse_obj_list_alg)
+        
         while True:
             with self.lock:
                 if not self.queue.empty():
@@ -169,7 +163,7 @@ class SingleENV(multiprocessing.Process):
         else:
             self.p_env = bc.BulletClient(connection_mode=p.DIRECT) # DIRECT,GUI_SERVER
         if self.update_style_flag == "time":
-            self.p_env.setTimeStep(self.sim_time_step)
+            self.p_env.setTimeStep(self.SIM_TIME_STEP)
         else:
             pass # 
         self.p_env.resetDebugVisualizerCamera(cameraDistance=1., cameraYaw=90, cameraPitch=-50, cameraTargetPosition=[0.1,0.15,0.35])  
@@ -207,7 +201,7 @@ class SingleENV(multiprocessing.Process):
             barry_ori_3 = self.p_env.getQuaternionFromEuler([0,math.pi/2,math.pi/2])
             barry_id_3 = self.p_env.loadURDF(os.path.expanduser("~/project/object/others/barrier.urdf"), barry_pos_3, barry_ori_3, useFixedBase = 1)
 
-            if self.task_flag != "4": # slope
+
             board_pos_1 = [0.274, 0.581, 0.87575]
             board_ori_1 = self.p_env.getQuaternionFromEuler([math.pi/2,math.pi/2,0])
             self.board_id_1 = self.p_env.loadURDF(os.path.expanduser("~/project/object/others/board.urdf"), board_pos_1, board_ori_1, useFixedBase = 1)
@@ -224,7 +218,7 @@ class SingleENV(multiprocessing.Process):
 
     def add_target_objects(self):
         print_object_name_flag = 0
-        for obj_index in range(self.object_num):
+        for obj_index in range(self.OBJECT_NUM):
             obj_obse_pos = self.pw_T_obj_obse_obj_list_alg[obj_index].pos
             obj_obse_ori = self.pw_T_obj_obse_obj_list_alg[obj_index].ori
             obj_obse_name = self.pw_T_obj_obse_obj_list_alg[obj_index].obj_name
@@ -277,115 +271,32 @@ class SingleENV(multiprocessing.Process):
             self.objects_list[obj_index] = objPose
 
     def get_objects_pose(self, par_index):
-        # for time_index in range(int(self.pf_update_interval_in_sim)):
-        #     self.p_env.stepSimulation()
-        return_results = []
-        for obj_index in range(self.object_num):
-            obj_id = self.particle_objects_id_collection[obj_index]
-            obj_info = self.p_env.getBasePositionAndOrientation(obj_id)    
-            obj_name = self.OBJECT_NAME_LIST[obj_index]
-            obj_tuple = (obj_name, obj_info)
-            return_results.append(obj_tuple)
-            pos_ = obj_info[0]
-            ori_ = obj_info[1]
-            self.objects_list[obj_index].pos = [pos_[0], pos_[1], pos_[2]]
-            self.objects_list[obj_index].ori = [ori_[0], ori_[1], ori_[2], ori_[3]] # x, y, z, w
-        return_results.append((str(par_index), self.objects_list))
-        # self.p_env.disconnect()
+        return_results = self.env.get_objects_pose(par_index)
         return return_results
 
     def isAnyParticleInContact(self):
-        for obj_index in range(self.object_num):
-            # get object ID
-            obj_id = self.particle_objects_id_collection[obj_index]
-            # check contact 
-            pmin, pmax = self.p_env.getAABB(obj_id)
-            collide_ids = self.p_env.getOverlappingObjects(pmin, pmax)
-            length = len(collide_ids)
-            for t_i in range(length):
-                if collide_ids[t_i][1] == 8 or collide_ids[t_i][1] == 9 or collide_ids[t_i][1] == 10 or collide_ids[t_i][1] == 11:
-                    return [('result', True)]
-        return [('result', False)]
-
-    def motion_model(self, joint_states, par_index):
-        # change object parameters
-        collision_detection_obj_id_ = []
-        return_results = []
-        for obj_index in range(self.object_num):
-            obj_id = self.objects_list[obj_index].no_visual_par_id
-            # self.p_env.resetBaseVelocity(obj_id, 0, 0)
-            self.p_env.resetBaseVelocity(obj_id,
-                                         self.objects_list[obj_index].linearVelocity,
-                                         self.objects_list[obj_index].angularVelocity,)
-            self.change_obj_parameters(obj_id, obj_index)
-        # execute the control
-        self.move_robot_JointPosition(joint_states)
-        # collision check: add robot
-        collision_detection_obj_id_.append(self.robot_id)
-        # collision check: add board
-        if self.task_flag != "4": # slope 
-            collision_detection_obj_id_.append(self.board_id_1)
-        # collision check
-        for obj_index in range(self.object_num):
-            obj_id = self.objects_list[obj_index].no_visual_par_id
-            # get linearVelocity and angularVelocity of the object from each particle
-            linearVelocity, angularVelocity = self.p_env.getBaseVelocity(obj_id)
-            obj_cur_pos, obj_cur_ori = self.get_item_pos(obj_id)
-            normal_x = obj_cur_pos[0]
-            normal_y = obj_cur_pos[1]
-            normal_z = obj_cur_pos[2]
-            pb_quat = obj_cur_ori
-            # add noise on pose of each particle
-            if self.OBJ_MOTION_MODEL_NOISE_FLAG == True:
-                normal_x, normal_y, normal_z, pb_quat = self.add_noise_pose(obj_cur_pos, obj_cur_ori)
-                self.p_env.resetBasePositionAndOrientation(obj_id, [normal_x, normal_y, normal_z], pb_quat)
-                collision_detection_obj_id_.append(obj_id)
-                obj_pose_3_1 = [normal_x, normal_y, normal_z, pb_quat]
-                normal_x, normal_y, normal_z, pb_quat = self.collision_check(collision_detection_obj_id_,
-                                                                             obj_cur_pos, obj_cur_ori,
-                                                                             obj_id, obj_index, obj_pose_3_1)
-
-            self.update_object_pose_PB(obj_index, normal_x, normal_y, normal_z, pb_quat, linearVelocity, angularVelocity)
-        self.p_env.stepSimulation()
-        return_results = self.get_objects_pose(par_index)
+        return_results = self.env.isAnyParticleInContact()
         return return_results
 
+    def motion_model(self, joint_states, par_index):
+        return_results = self.env.motion_model(joint_states, par_index)
+        return return_results
 
     def init_set_sim_robot_JointPosition(self, joint_states):
-        num_joints = 9
-        for joint_index in range(num_joints):
-            if joint_index == 7 or joint_index == 8:
-                self.p_env.resetJointState(self.robot_id,
-                                           joint_index+2,
-                                           targetValue=joint_states[joint_index])
-            else:
-                self.p_env.resetJointState(self.robot_id,
-                                           joint_index,
-                                           targetValue=joint_states[joint_index])
+        self.env.init_set_sim_robot_JointPosition(joint_states)
 
     def move_robot_JointPosition(self, joint_states):
-        num_joints = 9
-        for joint_index in range(num_joints):
-            if joint_index == 7 or joint_index == 8:
-                self.p_env.setJointMotorControl2(self.robot_id, joint_index+2,
-                                                 self.p_env.POSITION_CONTROL,
-                                                 targetPosition=joint_states[joint_index])
-            else:
-                self.p_env.setJointMotorControl2(self.robot_id, joint_index,
-                                                 self.p_env.POSITION_CONTROL,
-                                                 targetPosition=joint_states[joint_index])
-        for time_index in range(int(self.pf_update_interval_in_sim)):
-            self.p_env.stepSimulation()
-        return [("done", True)]
+        return_results = self.env.move_robot_JointPosition(joint_states)
+        return return_results
 
     def compare_distance(self, par_index, pw_T_obj_obse_objects_pose_list, visual_by_DOPE_list, outlier_by_DOPE_list):
         weight =  1.0 / self.particle_num
-        weights_list = [weight] * self.object_num
-        for obj_index in range(self.object_num):
+        weights_list = [weight] * self.OBJECT_NUM
+        for obj_index in range(self.OBJECT_NUM):
             self.objects_list[obj_index].w = weight
         # at least one object is detected by camera
-        if (sum(visual_by_DOPE_list)<self.object_num) and (sum(outlier_by_DOPE_list)<self.object_num):
-            for obj_index in range(self.object_num):
+        if (sum(visual_by_DOPE_list)<self.OBJECT_NUM) and (sum(outlier_by_DOPE_list)<self.OBJECT_NUM):
+            for obj_index in range(self.OBJECT_NUM):
                 obj_name = self.OBJECT_NAME_LIST[obj_index]
                 weight =  1.0 / self.particle_num
                 obj_visual = visual_by_DOPE_list[obj_index]
@@ -453,7 +364,7 @@ class SingleENV(multiprocessing.Process):
         return [x, y, z], pb_quat
 
     def set_particle_in_each_sim_env(self, single_particle):
-        for obj_index in range(self.object_num):
+        for obj_index in range(self.OBJECT_NUM):
             x = single_particle[obj_index].pos[0]
             y = single_particle[obj_index].pos[1]
             z = single_particle[obj_index].pos[2]
@@ -486,9 +397,8 @@ class SingleENV(multiprocessing.Process):
         return item_info[0], item_info[1]
 
     def getLinkStates(self):
-        all_links_info = self.p_env.getLinkStates(self.robot_id, range(self.PANDA_ROBOT_LINK_NUMBER + 2), computeForwardKinematics=True) # 11+2; range: [0,13)
-        all_links_info = all_links_info[:12]
-        return [("links_info", all_links_info)]
+        return_results = self.env.getLinkStates()
+        return return_results
 
     # add noise
     def add_noise_pose(self, obj_cur_pos, obj_cur_ori): # obj_cur_pos: x,y,z; obj_cur_ori: x,y,z,w

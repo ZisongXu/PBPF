@@ -1,4 +1,5 @@
 ADDMatrix_flag: true
+BOSS_PF_UPDATE_INTERVAL_IN_REAL: null
 FRICTION_marker: fB
 MASS_marker: mBNN
 camera_info_topic_color: /camera/color/camera_info
@@ -119,6 +120,9 @@ otob_name_list:
 panda_robot_link_number: 11
 particle_num: 50
 persp_to_ortho_flag: false
+pf_update_frequency:
+  CVPF: 0.025
+  PBPF: 0.25
 physics_simulation: pybullet
 pick_particle_rate: 0.0
 print_flag: false
@@ -137,6 +141,7 @@ sigma_obs_ang_for_init: 0.2
 sigma_obs_pos_for_init: 0.02
 sigma_obs_z_for_init: 0.02
 sim_real_world_flag: true
+sim_time_step: 0.01
 task_flag: '1'
 test_initial_rendered_depth_image_flag: false
 update_style_flag: time

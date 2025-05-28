@@ -4,6 +4,17 @@
 import pybullet as p
 import pybullet_data
 from pybullet_utils import bullet_client as bc
+#
+import math
+import random
+import os
+# 
+from pyquaternion import Quaternion
+#
+from PhysicsEnv import PhysicsEnv
+from quaternion_averaging import weightedAverageQuaternions
+from Particle import Particle
+from Object_Pose import Object_Pose
 from PhysicsEnv import PhysicsEnv
 
 class PyBulletEnv(PhysicsEnv):
@@ -14,14 +25,23 @@ class PyBulletEnv(PhysicsEnv):
         self.parameter_info = parameter_info
         
         # ============================================================================
+
+        self.RUN_ALG_FLAG = self.parameter_info['run_alg_flag']
         
         self.PHYSICS_SIMULATION = self.parameter_info['physics_simulation']
+        self.update_style_flag = self.parameter_info['update_style_flag']
+        self.SIM_TIME_STEP = self.parameter_info['sim_time_step']
+        self.PF_UPDATE_FREQUENCY = self.parameter_info['pf_update_frequency']
+    
+        self.PF_UPDATE_INTERVAL_IN_SIM = self.PF_UPDATE_FREQUENCY[self.RUN_ALG_FLAG] / self.SIM_TIME_STEP
+        
         self.gazebo_flag = self.parameter_info['gazebo_flag']
         self.task_flag = self.parameter_info['task_flag']
         self.SIM_REAL_WORLD_FLAG = self.parameter_info['sim_real_world_flag']
         self.SHOW_RAY = self.parameter_info['show_ray'] 
         self.OBJECT_NAME_LIST = self.parameter_info['object_name_list']
         self.OBJECT_NUM = self.parameter_info['object_num']
+        self.PARTICLE_NUM = self.parameter_info['particle_num']
         
         self.PANDA_ROBOT_LINK_NUMBER = self.parameter_info['panda_robot_link_number']
         self.MASS_marker = self.parameter_info['MASS_marker']
@@ -74,13 +94,23 @@ class PyBulletEnv(PhysicsEnv):
 
         # ============================================================================
 
-    def init_env(self):
+        self.collision_detection_obj_id_collection = []
+        self.particle_objects_id_collection = ["None"] * self.OBJECT_NUM
+        self.objects_list = ["None"] * self.OBJECT_NUM
+
+        # ============================================================================
+
+    def init_env(self, pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg):
+
+        self.pw_T_rob_sim_pose_list_alg = pw_T_rob_sim_pose_list_alg
+        self.pw_T_obj_obse_obj_list_alg = pw_T_obj_obse_obj_list_alg
+
         if self.SHOW_RAY == True:
             self.p_env = bc.BulletClient(connection_mode=p.GUI_SERVER) # DIRECT,GUI_SERVER
         else:
             self.p_env = bc.BulletClient(connection_mode=p.DIRECT) # DIRECT,GUI_SERVER
         if self.update_style_flag == "time":
-            self.p_env.setTimeStep(self.sim_time_step)
+            self.p_env.setTimeStep(self.SIM_TIME_STEP)
         else:
             pass # 
         self.p_env.resetDebugVisualizerCamera(cameraDistance=1., cameraYaw=90, cameraPitch=-50, cameraTargetPosition=[0.1,0.15,0.35])  
@@ -118,7 +148,6 @@ class PyBulletEnv(PhysicsEnv):
             barry_ori_3 = self.p_env.getQuaternionFromEuler([0,math.pi/2,math.pi/2])
             barry_id_3 = self.p_env.loadURDF(os.path.expanduser("~/project/object/others/barrier.urdf"), barry_pos_3, barry_ori_3, useFixedBase = 1)
 
-            if self.task_flag != "4": # slope
             board_pos_1 = [0.274, 0.581, 0.87575]
             board_ori_1 = self.p_env.getQuaternionFromEuler([math.pi/2,math.pi/2,0])
             self.board_id_1 = self.p_env.loadURDF(os.path.expanduser("~/project/object/others/board.urdf"), board_pos_1, board_ori_1, useFixedBase = 1)
@@ -135,7 +164,7 @@ class PyBulletEnv(PhysicsEnv):
 
     def add_target_objects(self):
         print_object_name_flag = 0
-        for obj_index in range(self.object_num):
+        for obj_index in range(self.OBJECT_NUM):
             obj_obse_pos = self.pw_T_obj_obse_obj_list_alg[obj_index].pos
             obj_obse_ori = self.pw_T_obj_obse_obj_list_alg[obj_index].ori
             obj_obse_name = self.pw_T_obj_obse_obj_list_alg[obj_index].obj_name
@@ -184,17 +213,17 @@ class PyBulletEnv(PhysicsEnv):
                         break
                 if flag == 0:
                     break
-            objPose = Particle(obj_obse_name, 0, particle_no_visual_id, particle_pos, particle_ori, 1/self.particle_num, 0, 0, 0)
+            objPose = Particle(obj_obse_name, 0, particle_no_visual_id, particle_pos, particle_ori, 1/self.PARTICLE_NUM, 0, 0, 0)
             self.objects_list[obj_index] = objPose
 
 
 
 
     def get_objects_pose(self, par_index):
-        # for time_index in range(int(self.pf_update_interval_in_sim)):
+        # for time_index in range(int(self.PF_UPDATE_INTERVAL_IN_SIM)):
         #     self.p_env.stepSimulation()
         return_results = []
-        for obj_index in range(self.object_num):
+        for obj_index in range(self.OBJECT_NUM):
             obj_id = self.particle_objects_id_collection[obj_index]
             obj_info = self.p_env.getBasePositionAndOrientation(obj_id)    
             obj_name = self.OBJECT_NAME_LIST[obj_index]
@@ -209,7 +238,7 @@ class PyBulletEnv(PhysicsEnv):
         return return_results
 
     def isAnyParticleInContact(self):
-        for obj_index in range(self.object_num):
+        for obj_index in range(self.OBJECT_NUM):
             # get object ID
             obj_id = self.particle_objects_id_collection[obj_index]
             # check contact 
@@ -225,7 +254,7 @@ class PyBulletEnv(PhysicsEnv):
         # change object parameters
         collision_detection_obj_id_ = []
         return_results = []
-        for obj_index in range(self.object_num):
+        for obj_index in range(self.OBJECT_NUM):
             obj_id = self.objects_list[obj_index].no_visual_par_id
             # self.p_env.resetBaseVelocity(obj_id, 0, 0)
             self.p_env.resetBaseVelocity(obj_id,
@@ -240,7 +269,7 @@ class PyBulletEnv(PhysicsEnv):
         if self.task_flag != "4": # slope 
             collision_detection_obj_id_.append(self.board_id_1)
         # collision check
-        for obj_index in range(self.object_num):
+        for obj_index in range(self.OBJECT_NUM):
             obj_id = self.objects_list[obj_index].no_visual_par_id
             # get linearVelocity and angularVelocity of the object from each particle
             linearVelocity, angularVelocity = self.p_env.getBaseVelocity(obj_id)
@@ -288,20 +317,20 @@ class PyBulletEnv(PhysicsEnv):
                 self.p_env.setJointMotorControl2(self.robot_id, joint_index,
                                                  self.p_env.POSITION_CONTROL,
                                                  targetPosition=joint_states[joint_index])
-        for time_index in range(int(self.pf_update_interval_in_sim)):
+        for time_index in range(int(self.PF_UPDATE_INTERVAL_IN_SIM)):
             self.p_env.stepSimulation()
         return [("done", True)]
 
     def compare_distance(self, par_index, pw_T_obj_obse_objects_pose_list, visual_by_DOPE_list, outlier_by_DOPE_list):
-        weight =  1.0 / self.particle_num
-        weights_list = [weight] * self.object_num
-        for obj_index in range(self.object_num):
+        weight =  1.0 / self.PARTICLE_NUM
+        weights_list = [weight] * self.OBJECT_NUM
+        for obj_index in range(self.OBJECT_NUM):
             self.objects_list[obj_index].w = weight
         # at least one object is detected by camera
-        if (sum(visual_by_DOPE_list)<self.object_num) and (sum(outlier_by_DOPE_list)<self.object_num):
-            for obj_index in range(self.object_num):
+        if (sum(visual_by_DOPE_list)<self.OBJECT_NUM) and (sum(outlier_by_DOPE_list)<self.OBJECT_NUM):
+            for obj_index in range(self.OBJECT_NUM):
                 obj_name = self.OBJECT_NAME_LIST[obj_index]
-                weight =  1.0 / self.particle_num
+                weight =  1.0 / self.PARTICLE_NUM
                 obj_visual = visual_by_DOPE_list[obj_index]
                 obj_outlier = outlier_by_DOPE_list[obj_index]
                 # obj_visual=0 means DOPE detects the object[obj_index]
@@ -367,7 +396,7 @@ class PyBulletEnv(PhysicsEnv):
         return [x, y, z], pb_quat
 
     def set_particle_in_each_sim_env(self, single_particle):
-        for obj_index in range(self.object_num):
+        for obj_index in range(self.OBJECT_NUM):
             x = single_particle[obj_index].pos[0]
             y = single_particle[obj_index].pos[1]
             z = single_particle[obj_index].pos[2]

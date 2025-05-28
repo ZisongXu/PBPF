@@ -72,7 +72,7 @@ from Create_Scene import Create_Scene
 from Object_Pose import Object_Pose
 from Robot_Pose import Robot_Pose
 from launch_camera import LaunchCamera
-
+from PyBulletEnv import PyBulletEnv
 
 _record_t_begin = time.time()
 
@@ -90,6 +90,9 @@ TASK_FLAG = parameter_info['task_flag'] # parameter_info['task_flag']
 run_alg_flag = parameter_info['run_alg_flag'] # PBPF/CVPF
 # update mode (pose/time)
 UPDATE_STYLE_FLAG = parameter_info['update_style_flag'] # time/pose
+SIM_TIME_STEP = parameter_info['sim_time_step'] # time/pose
+PF_UPDATE_FREQUENCY = parameter_info['pf_update_frequency'] # time/pose
+
 # observation model
 PICK_PARTICLE_RATE = parameter_info['pick_particle_rate']
 OPTITRACK_FLAG = parameter_info['optitrack_flag']
@@ -150,12 +153,12 @@ TEST_INITIAL_RENDERED_DEPTH_IMAGE_FLAG = parameter_info['test_initial_rendered_d
 MASS_marker = parameter_info['MASS_marker']
 FRICTION_marker = parameter_info['FRICTION_marker']
 
+PHYSICS_SIMULATION = parameter_info['physics_simulation']
 
 if RENDER_FLAG == 'vk':
     print("I am using Vulkan to generate Depth Image")
 elif RENDER_FLAG == 'pb': 
     print("I am using Pybullet to generate Depth Image")
-SIM_TIME_STEP = 1.0/100
 
 # ==============================================================================================================================
 
@@ -1000,14 +1003,13 @@ def compare_depth_image_vk_parallelised(real_depth_image_transferred):
     return scores_0
 
 
-def create_particles(object_num, robot_num, particle_num,
-                     pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg, 
-                     update_style_flag, sim_time_step, boss_pf_update_interval_in_real):
+def create_particles(phy_ENV,
+                     pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg
+                     ):
     manager = multiprocessing.Manager()
-    single_envs_ = {i: SingleENV(object_num, robot_num, particle_num,
+    single_envs_ = {i: SingleENV(phy_ENV,
                                  pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg, 
-                                 update_style_flag, sim_time_step, boss_pf_update_interval_in_real,
-                                 manager.dict()) for i in range(particle_num)}
+                                 manager.dict()) for i in range(PARTICLE_NUM)}
     for _, single_env in single_envs_.items():
         single_env.start()
         single_env.queue.put((SingleENV.dummy,))
@@ -1386,15 +1388,9 @@ if __name__ == '__main__':
 
     # ============================================================================
 
-    if run_alg_flag == "PBPF":
-        BOSS_PF_UPDATE_INTERVAL_IN_REAL = 0.25 
-        print("Algorithm:",run_alg_flag,"; VERSION:", VERSION, "; RENDER MODEL:", RENDER_FLAG, "; RUNNING MODEL:", RUNNING_MODEL)
-    elif run_alg_flag == 'CVPF':
-        BOSS_PF_UPDATE_INTERVAL_IN_REAL = 0.025
-        while True:
-            print("Not yet implemented")
-    PF_UPDATE_RATE = rospy.Rate(1.0/BOSS_PF_UPDATE_INTERVAL_IN_REAL)
-    print("PF UPDATE TIME FREQUENCY:", BOSS_PF_UPDATE_INTERVAL_IN_REAL)
+    print("Algorithm:",run_alg_flag,"; VERSION:", VERSION, "; RENDER MODEL:", RENDER_FLAG, "; RUNNING MODEL:", RUNNING_MODEL)
+    PF_UPDATE_RATE = rospy.Rate(1.0/PF_UPDATE_FREQUENCY[run_alg_flag])
+    print("PF UPDATE TIME FREQUENCY:", PF_UPDATE_FREQUENCY[run_alg_flag])
 
     # ============================================================================
 
@@ -1442,9 +1438,15 @@ if __name__ == '__main__':
     # ============================================================================
 
     # cpu parallel
-    _single_envs = create_particles(OBJECT_NUM, ROBOT_NUM, PARTICLE_NUM,
-                                    pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg, 
-                                    UPDATE_STYLE_FLAG, SIM_TIME_STEP, BOSS_PF_UPDATE_INTERVAL_IN_REAL)
+    if PHYSICS_SIMULATION == "pybullet":
+        phy_ENV = PyBulletEnv(parameter_info)
+    elif PHYSICS_SIMULATION == "mujoco":
+        pass
+    else:
+        pass
+    _single_envs = create_particles(phy_ENV,
+                                    pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg
+                                    )
 
     _objs_pose_info_list = [0] * PARTICLE_NUM
     _particle_cloud_pub = [0] * PARTICLE_NUM
