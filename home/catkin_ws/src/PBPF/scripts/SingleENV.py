@@ -188,37 +188,6 @@ class SingleENV(multiprocessing.Process):
             pw_T_pringles_ori = [ 0.67280124, -0.20574896, -0.20600051, 0.68012472] # x, y, z, w
             pringles_id = self.p_env.loadURDF(os.path.expanduser("~/project/object/others/pringles.urdf"),
                                               pw_T_pringles_pos, pw_T_pringles_ori, useFixedBase=1)
-        if self.task_flag == "4": # slope
-            pw_T_Milk_pos = [0.5255412218811237, 0.4092688983400049+0.13, 0.8156348920165202-2*0.0358583]
-            pw_T_Milk_ori = [ 0.71226091, -0.00120944, -0.00472836,  0.70189783]
-            base_Milk1_id = self.p_env.loadURDF(os.path.expanduser("~/project/object/Milk/Milk_par_no_visual_hor.urdf"),
-                                               pw_T_Milk_pos, pw_T_Milk_ori, useFixedBase=1)
-            pw_T_Milk_pos = [0.5255412218811237, 0.4092688983400049+0.13, 0.8156348920165202-2*0.0358583]
-            pw_T_Milk_ori = [ 0.71226091, -0.00120944, -0.00472836,  0.70189783]
-            base_Milk2_id = self.p_env.loadURDF(os.path.expanduser("~/project/object/Milk/Milk_par_no_visual_hor.urdf"),
-                                               pw_T_Milk_pos, pw_T_Milk_ori, useFixedBase=1)
-            board_pos_4 = [0.5255245316420766, 0.08585146275273556+0.13, 0.7858109052752488]
-            board_ori_4 = [0.0921379328294458, -1.0388626282143925e-05, -0.00014271076727580726, 0.9957462432063853]
-            self.board_id_4 = self.p_env.loadURDF(os.path.expanduser("~/project/object/others/board.urdf"),
-                                                     board_pos_4, 
-                                                     board_ori_4,
-                                                     useFixedBase = 1)
-        
-
-            # self.p_env.changeDynamics(board_id_4, -1, mass = 5, 
-            #                       lateralFriction = 1)
-
-            self.collision_detection_obj_id_collection.append(self.board_id_4)
-        
-
-        if self.task_flag == "6":
-            pw_T_Milk_opti_pos = [0.5639079993582834, 0.06686931205630225, 0.7947410960108179]
-            pw_T_Milk_opti_ori = [-0.61877113,  0.33879951,  0.61984684,  0.3436962 ]
-            obstacle_Milk_id = self.p_env.loadURDF(os.path.expanduser("~/project/object/Milk/Milk_real_obj_with_visual_hor.urdf"),
-                                                  pw_T_Milk_opti_pos,
-                                                  pw_T_Milk_opti_ori,
-                                                  useFixedBase=1)
-
 
         if self.SIM_REAL_WORLD_FLAG == True:
             table_pos_1 = [0.46, -0.01, 0.702] # 0.710
@@ -238,19 +207,11 @@ class SingleENV(multiprocessing.Process):
             barry_ori_3 = self.p_env.getQuaternionFromEuler([0,math.pi/2,math.pi/2])
             barry_id_3 = self.p_env.loadURDF(os.path.expanduser("~/project/object/others/barrier.urdf"), barry_pos_3, barry_ori_3, useFixedBase = 1)
 
-            # barry_pos_4 = [-0.549, 0.61, 0.895]
-            # barry_ori_4 = self.p_env.getQuaternionFromEuler([0,math.pi/2,math.pi/2])
-            # barry_id_4 = self.p_env.loadURDF(os.path.expanduser("~/project/object/others/barrier.urdf"), barry_pos_4, barry_ori_4, useFixedBase = 1)
-            
-            # barry_pos_5 = [0.499, 0.61, 0.895]
-            # barry_ori_5 = self.p_env.getQuaternionFromEuler([0,math.pi/2,math.pi/2])
-            # barry_id_5 = self.p_env.loadURDF(os.path.expanduser("~/project/object/others/barrier.urdf"), barry_pos_5, barry_ori_5, useFixedBase = 1)
-
             if self.task_flag != "4": # slope
-                board_pos_1 = [0.274, 0.581, 0.87575]
-                board_ori_1 = self.p_env.getQuaternionFromEuler([math.pi/2,math.pi/2,0])
-                self.board_id_1 = self.p_env.loadURDF(os.path.expanduser("~/project/object/others/board.urdf"), board_pos_1, board_ori_1, useFixedBase = 1)
-                self.collision_detection_obj_id_collection.append(self.board_id_1)
+            board_pos_1 = [0.274, 0.581, 0.87575]
+            board_ori_1 = self.p_env.getQuaternionFromEuler([math.pi/2,math.pi/2,0])
+            self.board_id_1 = self.p_env.loadURDF(os.path.expanduser("~/project/object/others/board.urdf"), board_pos_1, board_ori_1, useFixedBase = 1)
+            self.collision_detection_obj_id_collection.append(self.board_id_1)
 
     def add_robot(self):
         real_robot_start_pos = self.pw_T_rob_sim_pose_list_alg[0].pos
