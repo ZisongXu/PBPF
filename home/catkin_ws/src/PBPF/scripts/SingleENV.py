@@ -91,143 +91,53 @@ class SingleENV(multiprocessing.Process):
         self.PANDA_ROBOT_LINK_NUMBER = self.parameter_info['panda_robot_link_number']
         self.MASS_marker = self.parameter_info['MASS_marker']
         self.FRICTION_marker = self.parameter_info['FRICTION_marker']
+        
+        # ============================================================================
 
+        # Initialization Parameters
         self.sigma_obs_pos_for_init = self.parameter_info['sigma_obs_pos_for_init']
         self.sigma_obs_z_for_init = self.parameter_info['sigma_obs_z_for_init']
         self.sigma_obs_ang_for_init = self.parameter_info['sigma_obs_ang_for_init']
         self.sigma_obs_x_for_init = self.sigma_obs_pos_for_init / math.sqrt(2)
         self.sigma_obs_y_for_init = self.sigma_obs_pos_for_init / math.sqrt(2)
 
-        self.obj_mass_dict = self.parameter_info['obj_mass_list']
-            
-
-        self.MASS_MEAN_list = [0.5] * self.object_num
-        
-        self.MASS_SIGMA_list = [0.5] * self.object_num
-        self.MASS_SIGMA = 0.5 # 0.5
-        self.MASS_MIN_VALUE = 0.05
-        self.FRICTION_MEAN = 0.1
-        self.FRICTION_SIGMA = 0.3
-        # self.FRICTION_SIGMA = 0.0
-        self.RESTITUTION_MEAN = 0.9
-        self.RESTITUTION_SIGMA = 0.2 # 0.2
-        
-
+        # ============================================================================
 
         # Motion Model Parameters
-        self.MOTION_MODEL_POS_NOISE = 0.005 # original value = 0.005
-        self.MOTION_MODEL_ANG_NOISE = 0.05 # original value = 0.05/0.5 
-        # self.MOTION_MODEL_POS_NOISE = 0.0 # original value = 0.005
+        self.OBJ_MASS_MEAN_DICT = self.parameter_info['obj_mass_mean_dict']
+        self.OBJ_MASS_SIGMA_DICT = self.parameter_info['obj_mass_sigma_dict']
+        self.OBJ_MASS_MIN_MEAN_DICT = self.parameter_info['obj_mass_min_mean_dict']
+        self.OBJ_MASS_NOISE_FLAG = self.parameter_info['obj_mass_noise_flag']
+        self.OBJ_FRICTION_MEAN_DICT = self.parameter_info['obj_friction_mean_dict']
+        self.OBJ_FRICTION_SIGMA_DICT = self.parameter_info['obj_friction_sigma_dict']
+        self.OBJ_FRICTION_MIN_MEAN_DICT = self.parameter_info['obj_friction_min_mean_dict']
+        self.OBJ_FRICTION_NOISE_FLAG = self.parameter_info['obj_friction_noise_flag']
+        self.OBJ_RESTITUTION_MEAN = self.parameter_info['obj_restitution_mean']
+        self.OBJ_RESTITUTION_SIGMA = self.parameter_info['obj_restitution_sigma']
+        self.OBJ_MOTION_MODEL_POS_NOISE = self.parameter_info['obj_motion_model_pos_noise']
+        self.OBJ_MOTION_MODEL_ANG_NOISE = self.parameter_info['obj_motion_model_ang_noise']
+        self.OBJ_MOTION_MODEL_NOISE_FLAG = self.parameter_info['obj_motion_model_noise_flag']
 
-        self.MOTION_NOISE = True
-        self.MASS_NOISE = True
-        self.FRICTION_NOISE = True
+        # # Different labels of m and f are used to test the impact of varying mass and friction on tracking accuracy. 
+        # # You can set different parameters as needed. Details are omitted here.
+        if self.MASS_marker in {'mA', 'mB', 'mC', 'mD', 'mE', 'mF', 'mG'} and self.FRICTION_marker in {'fA', 'fB', 'fC', 'fD', 'fE', 'fF', 'fG'}:
+            self.OBJ_MOTION_MODEL_NOISE_FLAG = False
+            self.OBJ_MASS_NOISE_FLAG = False
+            self.OBJ_FRICTION_NOISE_FLAG = False
+        elif self.MASS_marker in {'mANN', 'mBNN', 'mCNN', 'mDNN', 'mENN', 'mFNN', 'mGNN'} or self.FRICTION_marker in {'fANN', 'fBNN', 'fCNN', 'fDNN', 'fENN', 'fFNN', 'fGNN'}:
+            self.OBJ_MOTION_MODEL_NOISE_FLAG = True
+            self.OBJ_MASS_NOISE_FLAG = True
+            self.OBJ_FRICTION_NOISE_FLAG = True
+        else:
+            pass
 
-        if self.MASS_marker == 'mA' or self.MASS_marker == 'mB' or self.MASS_marker == 'mC' or self.MASS_marker == 'mD' or self.MASS_marker == 'mE' or self.MASS_marker == 'mF' or self.MASS_marker == 'mG':
-            self.MOTION_NOISE = False
-            self.MASS_NOISE = False
-            self.FRICTION_NOISE = False
-        if self.MASS_marker == 'mAN' or self.MASS_marker == 'mBN' or self.MASS_marker == 'mCN' or self.MASS_marker == 'mDN' or self.MASS_marker == 'mEN' or self.MASS_marker == 'mFN' or self.MASS_marker == 'mGN':
-            self.MOTION_NOISE = True
-            self.MASS_NOISE = True
-            self.FRICTION_NOISE = False
-        if self.MASS_marker == 'mANN' or self.MASS_marker == 'mBNN' or self.MASS_marker == 'mCNN' or self.MASS_marker == 'mDNN' or self.MASS_marker == 'mENN' or self.MASS_marker == 'mFNN' or self.MASS_marker == 'mGNN':
-            self.MOTION_NOISE = True
-            self.MASS_NOISE = True
-            self.FRICTION_NOISE = True
-                
-
-        self.MASS_MEAN_list = [0.06] * self.object_num
-
-
-
-        if self.FRICTION_marker == 'fA' or self.FRICTION_marker == 'fAN' or self.FRICTION_marker == 'fANN':
-            self.FRICTION_MEAN = 0.01 # 0.01
-        elif self.FRICTION_marker == 'fB' or self.FRICTION_marker == 'fBN' or self.FRICTION_marker == 'fBNN':
-            self.FRICTION_MEAN = 0.38
-        elif self.FRICTION_marker == 'fC' or self.FRICTION_marker == 'fCN' or self.FRICTION_marker == 'fCNN':
-            self.FRICTION_MEAN = 0.25
-        elif self.FRICTION_marker == 'fD' or self.FRICTION_marker == 'fDN' or self.FRICTION_marker == 'fDNN':
-            self.FRICTION_MEAN = 0.38
-        elif self.FRICTION_marker == 'fE' or self.FRICTION_marker == 'fEN' or self.FRICTION_marker == 'fENN':
-            self.FRICTION_MEAN = 0.5
-        elif self.FRICTION_marker == 'fF' or self.FRICTION_marker == 'fFN' or self.FRICTION_marker == 'fFNN':
-            self.FRICTION_MEAN = 0.75
-        elif self.FRICTION_marker == 'fG' or self.FRICTION_marker == 'fGN' or self.FRICTION_marker == 'fGNN':
-            self.FRICTION_MEAN = 1
-
-
-
-        if self.MASS_NOISE == False:
-            self.MASS_SIGMA_list = [0.0] * self.object_num
-        if self.FRICTION_NOISE ==False:
-            self.FRICTION_SIGMA = 0
-
-
-
-        # self.MOTION_MODEL_ANG_NOISE = 0.0 # original value = 0.05/0.5 
-        self.mass_flag = False
-        if self.mass_flag == True:
-            self.MASS_MIN_VALUE = 0.02
-            for obj_num_index in range(self.object_num):
-                if self.OBJECT_NAME_LIST[obj_num_index] == "cracker":
-                    mass = 0.45
-                    self.MASS_MEAN_list[obj_num_index] = mass
-                    mass_sigma = 0.5
-                    self.MASS_SIGMA_list[obj_num_index] = mass_sigma
-                elif self.OBJECT_NAME_LIST[obj_num_index] == "Parmesan":
-                    mass = 0.035
-                    # mass = 100
-                    self.MASS_MEAN_list[obj_num_index] = mass
-                    mass_sigma = 0.1
-                    self.MASS_SIGMA_list[obj_num_index] = mass_sigma
-                elif self.OBJECT_NAME_LIST[obj_num_index] == "soup":
-                    mass = 0.35
-                    self.MASS_MEAN_list[obj_num_index] = mass
-                    mass_sigma = 0.5
-                    self.MASS_SIGMA_list[obj_num_index] = mass_sigma
-                elif self.OBJECT_NAME_LIST[obj_num_index] == "Milk":
-                    mass = 0.04
-                    # mass = 100
-                    self.MASS_MEAN_list[obj_num_index] = mass
-                    mass_sigma = 0.1
-                    self.MASS_SIGMA_list[obj_num_index] = mass_sigma
-                elif self.OBJECT_NAME_LIST[obj_num_index] == "Mustard":
-                    mass = 0.05
-                    self.MASS_MEAN_list[obj_num_index] = mass
-                    mass_sigma = 0.1
-                    self.MASS_SIGMA_list[obj_num_index] = mass_sigma
-                elif self.OBJECT_NAME_LIST[obj_num_index] == "Mayo":
-                    mass = 0.06
-                    self.MASS_MEAN_list[obj_num_index] = mass
-                    mass_sigma = 0.1
-                    self.MASS_SIGMA_list[obj_num_index] = mass_sigma
-                elif self.OBJECT_NAME_LIST[obj_num_index] == "SaladDressing":
-                    mass = 0.06
-                    self.MASS_MEAN_list[obj_num_index] = mass
-                    mass_sigma = 0.1
-                    self.MASS_SIGMA_list[obj_num_index] = mass_sigma
-                elif self.OBJECT_NAME_LIST[obj_num_index] == "Ketchup":
-                    mass = 0.06
-                    self.MASS_MEAN_list[obj_num_index] = mass
-                    mass_sigma = 0.1
-                    self.MASS_SIGMA_list[obj_num_index] = mass_sigma
-                else:
-                    mass = 1.5
-                    self.MASS_MEAN_list[obj_num_index] = mass
-                    mass_sigma = 0.1
-                    self.MASS_SIGMA_list[obj_num_index] = mass_sigma
-
-
+        # ============================================================================
 
         # Observation Model Parameters
-        self.OBS_SIGMA_POS_FOR_WEIGHT = 0.1
-        for name in self.OBJECT_NAME_LIST:
-            if name == "cracker":
-                self.OBS_SIGMA_ANG_FOR_WEIGHT = 0.0216773873 * 10 # 30
-            else:
-                self.OBS_SIGMA_ANG_FOR_WEIGHT = 0.0216773873 * 10
-
+        self.OBJ_SIGMA_POS_FOR_OBS_WEIGHT_DICT = self.parameter_info['obj_sigma_pos_for_obs_weight_dict']
+        self.OBJ_SIGMA_ANG_FOR_OBS_WEIGHT_DICT = self.parameter_info['obj_sigma_ang_for_obs_weight_dict']
+        
+        # ============================================================================
 
     def run(self):
         # This is needed due to how multiprocessing works which will fork the
@@ -458,7 +368,7 @@ class SingleENV(multiprocessing.Process):
             normal_z = obj_cur_pos[2]
             pb_quat = obj_cur_ori
             # add noise on pose of each particle
-            if self.MOTION_NOISE == True:
+            if self.OBJ_MOTION_MODEL_NOISE_FLAG == True:
                 normal_x, normal_y, normal_z, pb_quat = self.add_noise_pose(obj_cur_pos, obj_cur_ori)
                 self.p_env.resetBasePositionAndOrientation(obj_id, [normal_x, normal_y, normal_z], pb_quat)
                 collision_detection_obj_id_.append(obj_id)
@@ -508,6 +418,7 @@ class SingleENV(multiprocessing.Process):
         # at least one object is detected by camera
         if (sum(visual_by_DOPE_list)<self.object_num) and (sum(outlier_by_DOPE_list)<self.object_num):
             for obj_index in range(self.object_num):
+                obj_name = self.OBJECT_NAME_LIST[obj_index]
                 weight =  1.0 / self.particle_num
                 obj_visual = visual_by_DOPE_list[obj_index]
                 obj_outlier = outlier_by_DOPE_list[obj_index]
@@ -530,7 +441,7 @@ class SingleENV(multiprocessing.Process):
                     dis_y = abs(obj_y - obse_obj_pos[1])
                     dis_z = abs(obj_z - obse_obj_pos[2])
                     dis_xyz = math.sqrt(dis_x ** 2 + dis_y ** 2 + dis_z ** 2)
-                    weight_xyz = self.normal_distribution(dis_xyz, mean, self.OBS_SIGMA_POS_FOR_WEIGHT)
+                    weight_xyz = self.normal_distribution(dis_xyz, mean, self.OBJ_SIGMA_POS_FOR_OBS_WEIGHT_DICT[obj_name])
                     # rotation weight
                     obse_obj_quat = Quaternion(x=obse_obj_ori[0], y=obse_obj_ori[1], z=obse_obj_ori[2], w=obse_obj_ori[3]) # Quaternion(): w,x,y,z
                     par_quat = Quaternion(x=obj_ori[0], y=obj_ori[1], z=obj_ori[2], w=obj_ori[3])
@@ -541,7 +452,7 @@ class SingleENV(multiprocessing.Process):
                     sin_theta_over_2 = math.sqrt(err_bt_par_obse_corr_quat.x ** 2 + err_bt_par_obse_corr_quat.y ** 2 + err_bt_par_obse_corr_quat.z ** 2)
                     theta_over_2 = math.atan2(sin_theta_over_2, cos_theta_over_2)
                     theta = theta_over_2 * 2.0
-                    weight_ang = self.normal_distribution(theta, mean, self.OBS_SIGMA_ANG_FOR_WEIGHT)
+                    weight_ang = self.normal_distribution(theta, mean, self.OBJ_SIGMA_ANG_FOR_OBS_WEIGHT_DICT[obj_name])
                     weight = weight_xyz * weight_ang
                     self.objects_list[obj_index].w = weight
                     weights_list[obj_index] = weight
@@ -640,13 +551,13 @@ class SingleENV(multiprocessing.Process):
 
     def add_noise_2_par(self, current_pos):
         mean = current_pos
-        sigma = self.MOTION_MODEL_POS_NOISE
+        sigma = self.OBJ_MOTION_MODEL_POS_NOISE
         new_pos_is_added_noise = self.take_easy_gaussian_value(mean, sigma)
         return new_pos_is_added_noise
 
     def add_noise_2_ang(self, cur_angle):
         mean = cur_angle
-        sigma = self.MOTION_MODEL_ANG_NOISE
+        sigma = self.OBJ_MOTION_MODEL_ANG_NOISE
         new_ang_is_added_noise = self.take_easy_gaussian_value(mean, sigma)
         return new_ang_is_added_noise
     
@@ -706,19 +617,19 @@ class SingleENV(multiprocessing.Process):
     # change particle parameters
     def change_obj_parameters(self, obj_id, obj_index):
         obj_name = self.OBJECT_NAME_LIST[obj_index]
-        mass_a = self.take_easy_gaussian_value(self.obj_mass_dict[obj_name], self.MASS_SIGMA_list[obj_index])
-        if mass_a < 0.001:
-            mass_a = self.MASS_MIN_VALUE
-        lateralFriction = self.take_easy_gaussian_value(self.FRICTION_MEAN, self.FRICTION_SIGMA)
-        spinningFriction = self.take_easy_gaussian_value(self.FRICTION_MEAN, self.FRICTION_SIGMA)
-        rollingFriction = self.take_easy_gaussian_value(self.FRICTION_MEAN, self.FRICTION_SIGMA)
-        if lateralFriction < 0.001:
-            lateralFriction = 0.001
-        if spinningFriction < 0.001:
-            spinningFriction = 0.001
-        if rollingFriction < 0.001:
-            rollingFriction = 0.001
-        restitution = self.take_easy_gaussian_value(self.RESTITUTION_MEAN, self.RESTITUTION_SIGMA)
+        mass_a = self.take_easy_gaussian_value(self.OBJ_MASS_MEAN_DICT[obj_name], self.OBJ_MASS_SIGMA_DICT[obj_name])
+        if mass_a < self.OBJ_MASS_MIN_MEAN_DICT[obj_name]:
+            mass_a = self.OBJ_MASS_MIN_MEAN_DICT[obj_name]
+        lateralFriction = self.take_easy_gaussian_value(self.OBJ_FRICTION_MEAN_DICT[obj_name], self.OBJ_FRICTION_SIGMA_DICT[obj_name])
+        spinningFriction = self.take_easy_gaussian_value(self.OBJ_FRICTION_MEAN_DICT[obj_name], self.OBJ_FRICTION_SIGMA_DICT[obj_name])
+        rollingFriction = self.take_easy_gaussian_value(self.OBJ_FRICTION_MEAN_DICT[obj_name], self.OBJ_FRICTION_SIGMA_DICT[obj_name])
+        if lateralFriction < self.OBJ_FRICTION_MIN_MEAN_DICT[obj_name]:
+            lateralFriction = self.OBJ_FRICTION_MIN_MEAN_DICT[obj_name]
+        if spinningFriction < self.OBJ_FRICTION_MIN_MEAN_DICT[obj_name]:
+            spinningFriction = self.OBJ_FRICTION_MIN_MEAN_DICT[obj_name]
+        if rollingFriction < self.OBJ_FRICTION_MIN_MEAN_DICT[obj_name]:
+            rollingFriction = self.OBJ_FRICTION_MIN_MEAN_DICT[obj_name]
+        restitution = self.take_easy_gaussian_value(self.OBJ_RESTITUTION_MEAN, self.OBJ_RESTITUTION_SIGMA)
         self.p_env.changeDynamics(obj_id, -1, mass = mass_a, 
                                   lateralFriction = lateralFriction, 
                                   spinningFriction = spinningFriction, 

@@ -22,7 +22,35 @@ ignore_edge_pixels: false
 locate_camera_flag: ar
 multiprocessing_flag: false
 nearVal: 0.03
-obj_mass_list:
+obj_friction_mean_dict:
+  Ketchup: 0.1
+  Mayo: 0.1
+  Milk: 0.1
+  Mustard: 0.1
+  Parmesan: 0.1
+  SaladDressing: 0.1
+  cracker: 0.1
+  soup: 0.1
+obj_friction_min_mean_dict:
+  Ketchup: 0.001
+  Mayo: 0.001
+  Milk: 0.001
+  Mustard: 0.001
+  Parmesan: 0.001
+  SaladDressing: 0.001
+  cracker: 0.001
+  soup: 0.001
+obj_friction_noise_flag: true
+obj_friction_sigma_dict:
+  Ketchup: 0.3
+  Mayo: 0.3
+  Milk: 0.3
+  Mustard: 0.3
+  Parmesan: 0.3
+  SaladDressing: 0.3
+  cracker: 0.3
+  soup: 0.3
+obj_mass_mean_dict:
   Ketchup: 0.06
   Mayo: 0.06
   Milk: 0.04
@@ -31,6 +59,48 @@ obj_mass_list:
   SaladDressing: 0.06
   cracker: 0.45
   soup: 0.35
+obj_mass_min_mean_dict:
+  Ketchup: 0.001
+  Mayo: 0.001
+  Milk: 0.001
+  Mustard: 0.001
+  Parmesan: 0.001
+  SaladDressing: 0.001
+  cracker: 0.001
+  soup: 0.001
+obj_mass_noise_flag: true
+obj_mass_sigma_dict:
+  Ketchup: 0.1
+  Mayo: 0.1
+  Milk: 0.1
+  Mustard: 0.1
+  Parmesan: 0.1
+  SaladDressing: 0.1
+  cracker: 0.5
+  soup: 0.5
+obj_motion_model_ang_noise: 0.05
+obj_motion_model_noise_flag: true
+obj_motion_model_pos_noise: 0.005
+obj_restitution_mean: 0.9
+obj_restitution_sigma: 0.2
+obj_sigma_ang_for_obs_weight_dict:
+  Ketchup: 0.2
+  Mayo: 0.2
+  Milk: 0.2
+  Mustard: 0.2
+  Parmesan: 0.2
+  SaladDressing: 0.2
+  cracker: 0.2
+  soup: 0.2
+obj_sigma_pos_for_obs_weight_dict:
+  Ketchup: 0.1
+  Mayo: 0.1
+  Milk: 0.1
+  Mustard: 0.1
+  Parmesan: 0.1
+  SaladDressing: 0.1
+  cracker: 0.1
+  soup: 0.1
 object_name_list:
 - cracker
 - soup
