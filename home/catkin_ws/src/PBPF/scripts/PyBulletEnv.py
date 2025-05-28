@@ -494,7 +494,7 @@ class PyBulletEnv(PhysicsEnv):
             print("WARNING: Could not find a non-colliding pose after motion noise. Moving particle object to noise-less pose.")
             self.p_env.resetBasePositionAndOrientation(obj_id, obj_cur_pos, obj_cur_ori)
         return normal_x, normal_y, normal_z, pb_quat
-sdfsdf
+
 
     # change particle parameters
     def change_obj_parameters(self, obj_id, obj_index):
