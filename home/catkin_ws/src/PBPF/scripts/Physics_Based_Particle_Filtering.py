@@ -72,7 +72,6 @@ from Visualisation_World import Visualisation_World
 from Create_Scene import Create_Scene
 from Object_Pose import Object_Pose
 from Robot_Pose import Robot_Pose
-from Center_T_Point_for_Ray import Center_T_Point_for_Ray
 from launch_camera import LaunchCamera
 
 
