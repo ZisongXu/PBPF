@@ -1438,7 +1438,7 @@ if __name__ == '__main__':
     print("Camera depth len pose in Pybullet world:")
     print(_pw_T_camD_tf_4_4)
     print("========================")
-    pw_T_obj_obse_obj_list_alg, trans_ob_list, rot_ob_list = create_scene.initialize_object()
+    pw_T_obj_obse_obj_list_alg, trans_ob_list, rot_ob_list = create_scene.initialize_obs_object()
     print("trans_ob_list, rot_ob_list:")
     print(trans_ob_list, rot_ob_list)
     print("========================")

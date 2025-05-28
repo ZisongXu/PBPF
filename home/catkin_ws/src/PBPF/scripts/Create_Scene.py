@@ -45,7 +45,7 @@ from Robot_Pose import Robot_Pose
 import yaml
 #Class of initialize the real world model
 class Create_Scene():
-    def __init__(self, target_obj_num=0, rob_num=0):
+    def __init__(self, target_obj_num=0, rob_num=1):
         self.target_obj_num = target_obj_num
         self.rob_num = rob_num
 
@@ -72,11 +72,8 @@ class Create_Scene():
         self.optitrack_prom = True
         self.optitrack_flag = self.parameter_info['optitrack_flag']
 
-        self.OBJS_ARE_NOT_TOUCHING_TARGET_OBJS_NUM = self.parameter_info['objs_are_not_touching_target_objs_num']
-        self.OBJS_TOUCHING_TARGET_OBJS_NUM = self.parameter_info['objs_touching_target_objs_num']
-
         
-    def initialize_object(self):
+    def initialize_obs_object(self):
         print_note_flag_list = [0] * self.target_obj_num
         #####################################################
         tmp_mark_obj_pose_array = np.zeros((self.target_obj_num, 2))
@@ -180,52 +177,6 @@ class Create_Scene():
             self.pw_T_rob_sim_pose_list.append(rob_pose)
         return self.pw_T_rob_sim_pose_list
     
-    # In this function, we think only one foundation for cracker by default, which may have to be modified afterwards
-    def initialize_other_objects_touching(self, objs_touching_target_objs_num_, objs_touching_target_objs_name_list):
-        # get rob pose in pybullet world
-        opti_T_rob_opti_pos = self.ros_listener.listen_2_robot_pose()[0]
-        opti_T_rob_opti_ori = self.ros_listener.listen_2_robot_pose()[1]
-        pw_T_rob_sim_4_4 = self.pw_T_rob_sim_pose_list[0].trans_matrix
-
-        for oto_index in range(objs_touching_target_objs_num_):
-            objs_touching_target_objs_name = objs_touching_target_objs_name_list[oto_index]
-            objs_touching_target_objs_pos = self.ros_listener.listen_2_object_pose(objs_touching_target_objs_name)[0]
-            objs_touching_target_objs_ori = self.ros_listener.listen_2_object_pose(objs_touching_target_objs_name)[1]
-            robot_T_other_t = self.compute_transformation_matrix(opti_T_rob_opti_pos, 
-                                                                 opti_T_rob_opti_ori, 
-                                                                 objs_touching_target_objs_pos, 
-                                                                 objs_touching_target_objs_ori)
-            pw_T_other_t = np.dot(pw_T_rob_sim_4_4, robot_T_other_t)
-            pw_T_other_t_pos = [pw_T_other_t[0][3], pw_T_other_t[1][3], pw_T_other_t[2][3]]
-            pw_T_other_t_ori = transformations.quaternion_from_matrix(pw_T_other_t)
-            pw_T_other_t_opti = Object_Pose(objs_touching_target_objs_name, 0, pw_T_other_t_pos, pw_T_other_t_ori, oto_index)
-            self.pw_T_objs_touching_targetObjs_list.append(pw_T_other_t_opti)
-
-        return self.pw_T_objs_touching_targetObjs_list
-
-    def initialize_other_objects_not_touching(self, objs_not_touching_target_objs_num_, objs_not_touching_target_objs_name_list):
-        # get rob pose in pybullet world
-        opti_T_rob_opti_pos = self.ros_listener.listen_2_robot_pose()[0]
-        opti_T_rob_opti_ori = self.ros_listener.listen_2_robot_pose()[1]
-        pw_T_rob_sim_4_4 = self.pw_T_rob_sim_pose_list[0].trans_matrix
-
-        for oto_index in range(objs_not_touching_target_objs_num_):
-            objs_not_touching_target_objs_name = objs_not_touching_target_objs_name_list[oto_index]
-            objs_touching_target_objs_pos = self.ros_listener.listen_2_object_pose(objs_not_touching_target_objs_name)[0]
-            objs_touching_target_objs_ori = self.ros_listener.listen_2_object_pose(objs_not_touching_target_objs_name)[1]
-            robot_T_other_nt = self.compute_transformation_matrix(opti_T_rob_opti_pos, 
-                                                                  opti_T_rob_opti_ori, 
-                                                                  objs_touching_target_objs_pos, 
-                                                                  objs_touching_target_objs_ori)
-            pw_T_other_nt = np.dot(pw_T_rob_sim_4_4, robot_T_other_nt)
-            pw_T_other_nt_pos = [pw_T_other_nt[0][3], pw_T_other_nt[1][3], pw_T_other_nt[2][3]]
-            pw_T_other_nt_ori = transformations.quaternion_from_matrix(pw_T_other_nt)
-            pw_T_other_nt_opti = Object_Pose(objs_not_touching_target_objs_name, 0, pw_T_other_nt_pos, pw_T_other_nt_ori, oto_index)
-            self.pw_T_objs_not_touching_targetObjs_list.append(pw_T_other_nt_opti)
-
-
-        return self.pw_T_objs_not_touching_targetObjs_list
-
     def initialize_ground_truth_objects(self):
         if self.gazebo_flag == True:
             for obj_index in range(self.target_obj_num):
@@ -255,24 +206,6 @@ class Create_Scene():
                 opti_obj = Object_Pose(self.object_name_list[obj_index], 0, pw_T_obj_opti_pos, pw_T_obj_opti_ori, obj_index)
                 self.pw_T_target_obj_opti_pose_lsit.append(opti_obj)
     
-                # model_pose, _ = self.ros_listener.listen_2_object_pose(self.object_name_list[obj_index])
-                # panda_pose = self.ros_listener.listen_2_robot_pose()
-                
-                # gazebo_T_obj_pos = model_pose[0]
-                # gazebo_T_obj_ori = model_pose[1]
-                # gazebo_T_rob_pos = panda_pose[0]
-                # gazebo_T_rob_ori = panda_pose[1]
-                
-                # pw_T_rob_sim_4_4 = self.pw_T_rob_sim_pose_list[0].trans_matrix
-                
-                # rob_T_obj_opti_4_4 = self.compute_transformation_matrix(gazebo_T_rob_pos, gazebo_T_rob_ori, gazebo_T_obj_pos, gazebo_T_obj_ori)
-                # # rob_T_obj_opti_4_4 = np.dot(robpw_T_robga_4_4, rob_T_obj_opti_4_4)
-                # pw_T_obj_opti = np.dot(pw_T_rob_sim_4_4, rob_T_obj_opti_4_4)
-                # pw_T_obj_opti_pos = [pw_T_obj_opti[0][3], pw_T_obj_opti[1][3], pw_T_obj_opti[2][3]]
-                # pw_T_obj_opti_ori = transformations.quaternion_from_matrix(pw_T_obj_opti)
-                # opti_obj = Object_Pose(self.object_name_list[obj_index], 0, pw_T_obj_opti_pos, pw_T_obj_opti_ori, obj_index)
-                # self.pw_T_target_obj_opti_pose_lsit.append(opti_obj)
-
                 self.trans_gt_list.append(trans_gt)
                 self.rot_gt_list.append(rot_gt)
                 
@@ -300,29 +233,6 @@ class Create_Scene():
                 pw_T_obj_opti_ori = transformations.quaternion_from_matrix(pw_T_obj_opti_4_4)
                 opti_obj = Object_Pose(self.object_name_list[obj_index], 0, pw_T_obj_opti_pos, pw_T_obj_opti_ori, obj_index)
                 self.pw_T_target_obj_opti_pose_lsit.append(opti_obj)
-            
-            # mark
-            # other objects touching
-            for obj_index in range(self.OBJS_TOUCHING_TARGET_OBJS_NUM):
-                opti_T_base_opti_pos = self.ros_listener.listen_2_object_pose("base")[0]
-                opti_T_base_opti_ori = self.ros_listener.listen_2_object_pose("base")[1]
-                robot_T_base = self.compute_transformation_matrix(opti_T_rob_opti_pos, opti_T_rob_opti_ori, opti_T_base_opti_pos, opti_T_base_opti_ori)
-                pw_T_base = np.dot(pw_T_rob_sim_4_4, robot_T_base)
-                pw_T_base_pos = [pw_T_base[0][3], pw_T_base[1][3], pw_T_base[2][3]]
-                pw_T_base_ori = transformations.quaternion_from_matrix(pw_T_base)
-                opti_obj = Object_Pose("base_of_cheezit", 1000000000, pw_T_base_pos, pw_T_base_ori, obj_index)
-                self.pw_T_objs_touching_targetObjs_list.append(opti_obj)
-            
-            # other objects not touching
-            for obj_index in range(self.OBJS_ARE_NOT_TOUCHING_TARGET_OBJS_NUM):
-                opti_T_base_opti_pos = self.ros_listener.listen_2_object_pose("pringles")[0]
-                opti_T_base_opti_ori = self.ros_listener.listen_2_object_pose("pringles")[1]
-                robot_T_base = self.compute_transformation_matrix(opti_T_rob_opti_pos, opti_T_rob_opti_ori, opti_T_base_opti_pos, opti_T_base_opti_ori)
-                pw_T_base = np.dot(pw_T_rob_sim_4_4, robot_T_base)
-                pw_T_base_pos = [pw_T_base[0][3], pw_T_base[1][3], pw_T_base[2][3]]
-                pw_T_base_ori = transformations.quaternion_from_matrix(pw_T_base)
-                opti_obj = Object_Pose("pringles", 1000000000, pw_T_base_pos, pw_T_base_ori, obj_index)
-                self.pw_T_objs_not_touching_targetObjs_list.append(opti_obj)
 
             trans_gt = 0
             rot_gt = 0

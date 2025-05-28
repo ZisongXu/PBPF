@@ -210,13 +210,13 @@ class Visualisation_World():
         #     print(ori)
 
         # observation: target obejct pose list
-        pw_T_target_obj_obse_pose_lsit, trans_ob_list, rot_ob_list = self.create_scene.initialize_object()
+        pw_T_target_obj_obse_pose_lsit, trans_ob_list, rot_ob_list = self.create_scene.initialize_obs_object()
         self.pw_T_target_obj_obse_pose_lsit = pw_T_target_obj_obse_pose_lsit
         # print("I am here")
         
         # load other objects in the pybullet world
         if self.test == False:
-            if self.optitrack_flag == False:
+            if self.optitrack_flag == True:
                 print("Load Target Object from OptiTrackssssssssss")
                 pw_T_target_obj_opti_pose_lsit, pw_T_other_obj_opti_pose_list, pw_T_objs_not_touching_targetObjs_list, trans_gt, rot_gt = self.create_scene.initialize_ground_truth_objects()
                 
@@ -488,7 +488,7 @@ while reset_flag == True:
         display_par_flag = True
         display_esti_flag = False
         
-        display_gt_flag = False
+        display_gt_flag = True
         # if optitrack_flag == False:
         #     display_gt_flag = False
 
