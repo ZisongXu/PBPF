@@ -143,3 +143,4 @@ use_convolution_flag: false
 version: multiray
 visibility_compute_separate_flag: true
 visibility_compute_vk: true
+physics_simulation: pybullet

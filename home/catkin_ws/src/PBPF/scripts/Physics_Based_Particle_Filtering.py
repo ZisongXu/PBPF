@@ -1441,6 +1441,8 @@ if __name__ == '__main__':
     print("========================")
     print("Finish initializing scene")
 
+    # ============================================================================
+
     # cpu parallel
     _single_envs = create_particles(OBJECT_NUM, ROBOT_NUM, PARTICLE_NUM,
                                     pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg, 
@@ -1456,12 +1458,12 @@ if __name__ == '__main__':
         _objs_pose_info_list[env_index] = objs_pose_info
         _particle_cloud_pub[env_index] = objs_pose_info[str(env_index)]
     t2 = time.time()
-    print(t2-t1)
+    # print(t2-t1)
+
     # ============================================================================
 
     # get estimated object
     estimated_object_set = _compute_estimate_pos_of_object(_particle_cloud_pub)
-
     # publish particles/estimated object
     # first publish
     _publish_par_pose_info(_particle_cloud_pub)
@@ -1474,8 +1476,8 @@ if __name__ == '__main__':
     # estimated_object_set_old = copy.deepcopy(estimated_object_set)
     # estimated_object_set_old_list = process_esti_pose_from_rostopic(estimated_object_set_old)
 
-    print("Before locating the pose of the camera")
-    # if VERSION == "ray" or VERSION == "multiray":
+    # ============================================================================
+
     if OPTITRACK_FLAG == True and LOCATE_CAMERA_FLAG == "opti": # ar/opti
         realsense_tf = '/RealSense' # (use Optitrack)
     else:

@@ -79,6 +79,8 @@ class SingleENV(multiprocessing.Process):
         
         with open(os.path.expanduser("~/catkin_ws/src/PBPF/config/parameter_info.yaml"), 'r') as file:
             self.parameter_info = yaml.safe_load(file)
+
+        self.PHYSICS_SIMULATION = self.parameter_info['physics_simulation']
         self.gazebo_flag = self.parameter_info['gazebo_flag']
         self.task_flag = self.parameter_info['task_flag']
         self.SIM_REAL_WORLD_FLAG = self.parameter_info['sim_real_world_flag']
@@ -143,7 +145,12 @@ class SingleENV(multiprocessing.Process):
         # if the seed is not re-generated in each process, 
         # each process will generate the same noisy trajectory.
         np.random.seed()
-        self.init_pybullet()
+        if self.PHYSICS_SIMULATION == 'pybullet':
+            self.init_pybullet()
+        elif self.PHYSICS_SIMULATION == 'mujoco':
+            pass
+        else:
+            pass
         while True:
             with self.lock:
                 if not self.queue.empty():
