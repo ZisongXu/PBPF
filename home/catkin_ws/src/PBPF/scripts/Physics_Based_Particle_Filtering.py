@@ -67,7 +67,6 @@ from Ros_Listener import Ros_Listener
 from Particle import Particle
 from InitialSimulationModel import InitialSimulationModel
 from SingleENV import SingleENV
-from Realworld import Realworld
 from Visualisation_World import Visualisation_World
 from Create_Scene import Create_Scene
 from Object_Pose import Object_Pose
