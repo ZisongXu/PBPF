@@ -103,6 +103,16 @@ CONVOLUTION_SIZE = parameter_info['convolution_size'] # old/ray/multiray/depth_i
 simRobot_touch_par_flag = 0
 OBJECT_NUM = parameter_info['object_num']
 ROBOT_NUM = parameter_info['robot_num']
+OBJ_SHAPE = parameter_info['obj_shape']
+#####################################
+OBJ_VISIBLESCORE_OBSE_WORK_THRESHOLD = parameter_info['obj_VisibleScore_obse_work_threshold']
+OBJ_VISIBLESCORE_OBSE_FAIL_THRESHOLD_HIGH = parameter_info['obj_VisibleScore_obse_fail_threshold_high']
+OBJ_VISIBLESCORE_OBSE_FAIL_THRESHOLD_LOW = parameter_info['obj_VisibleScore_obse_fail_threshold_low']
+OBJ_VISIBLESCORE_OBSE_FAIL_WEIGHT_HIGH = parameter_info['obj_VisibleScore_obse_fail_weight_high']
+OBJ_VISIBLESCORE_OBSE_FAIL_WEIGHT_LOW = parameter_info['obj_VisibleScore_obse_fail_weight_low']
+OBJ_OUTLIER_STANDARD = parameter_info['obj_outlier_standard']
+#####################################
+
 
 SIM_REAL_WORLD_FLAG = parameter_info['sim_real_world_flag']
 
@@ -939,35 +949,35 @@ def visibility_computing_vk(particle_cloud, RGB_weights_lists_):
         full = _vk_context.full_vis_counts(index)
         full_arr = np.array(full, copy = False)
         for obj_index in range(OBJECT_NUM):
+            object_name = OBJECT_NAME_LIST[obj_index]
             if full_arr[obj_index] == 0:
                 # input()
                 weight = RGB_weights_lists_[index][obj_index]
                 weight = weight * 0.1
             else:
                 visible_score = 1.0 * part_arr[obj_index] / full_arr[obj_index]
-                # print("visible_score:", visible_score)
                 _record_t_visible_score = time.time()
                 # _boss_GT_visibility_ADD_df_list[obj_index].loc[_par_panda_step] = [_par_panda_step, _record_t_visible_score - _record_t_begin, visible_score]
                 # _boss_GT_visibility_ADD_df_list[obj_index].loc[_par_panda_step] = [_par_panda_step, _record_t_visible_score - _record_t_begin, 0,0,0,0,0,0,0,0,0,0,0,visible_score,0,0,0]
 
                 # weight = particle[obj_index].w
                 weight = RGB_weights_lists_[index][obj_index]
-                local_obj_visual_by_DOPE_val = global_objects_visual_by_DOPE_list[obj_index]
-                local_obj_outlier_by_DOPE_val = global_objects_outlier_by_DOPE_list[obj_index]
+                local_obj_visual_by_DOPE_val = global_objects_visual_by_OBSE_list[obj_index]
+                local_obj_outlier_by_DOPE_val = global_objects_outlier_by_OBSE_list[obj_index]
                 if local_obj_visual_by_DOPE_val==0 and local_obj_outlier_by_DOPE_val==0:
                     # visible_score low, weight low
-                    if visible_score < visible_threshold_dope_is_fresh_list[obj_index]:
+                    if visible_score < OBJ_VISIBLESCORE_OBSE_WORK_THRESHOLD[object_name]:
                         weight = weight / 3.0
-                        weight = weight * visible_score
+                        # weight = weight * visible_score # for test
                     # visible_score high, weight high
                     else:
                         weight = weight
                 else:
                     # visible_score<0.95 low, weight high
-                    if visible_threshold_dope_X_small_list[obj_index]<=visible_score and visible_score<=visible_threshold_dope_X_list[obj_index]:
-                        weight = visible_weight_dope_X_smaller_than_threshold_list[obj_index] * weight
+                    if OBJ_VISIBLESCORE_OBSE_FAIL_THRESHOLD_LOW[object_name]<=visible_score and visible_score<=OBJ_VISIBLESCORE_OBSE_FAIL_THRESHOLD_HIGH[object_name]:
+                        weight = OBJ_VISIBLESCORE_OBSE_FAIL_WEIGHT_HIGH[object_name] * weight
                     else:
-                        weight = visible_weight_dope_X_larger_than_threshold_list[obj_index] * weight # 0.25/0.5
+                        weight = OBJ_VISIBLESCORE_OBSE_FAIL_WEIGHT_LOW[object_name] * weight # 0.25/0.5
             particle_cloud[index][obj_index].w = weight
 
     return particle_cloud
@@ -1311,7 +1321,7 @@ if __name__ == '__main__':
     particle_depth_image_converted = Image()
     BRIDGE = CvBridge()
     # only for drawing box
-    publish_DOPE_pose_flag = True
+    publish_OBSE_pose_flag = True
 
     if RUNNING_MODEL == "PBPF_RGB":
         USING_RGB_FLAG = True
@@ -1565,185 +1575,29 @@ if __name__ == '__main__':
     latest_obse_time_list = [0] * OBJECT_NUM
     check_dope_work_flag_init_list = [0] * OBJECT_NUM
     
-    outlier_dis_list = [0] * OBJECT_NUM
-    outlier_ang_list = [0] * OBJECT_NUM
 
     # ============================================================================
     # set parameters
-    visible_threshold_dope_is_fresh_list = [0] * OBJECT_NUM
-    visible_threshold_dope_X_list = [0] * OBJECT_NUM 
-    visible_threshold_dope_X_small_list = [0] * OBJECT_NUM
-    visible_threshold_outlier_XS_list = [0] * OBJECT_NUM 
-    visible_threshold_outlier_S_list = [0] * OBJECT_NUM 
-    visible_threshold_outlier_L_list = [0] * OBJECT_NUM
-    visible_threshold_outlier_XL_list = [0] * OBJECT_NUM
-    visible_weight_dope_X_smaller_than_threshold_list = [0] * OBJECT_NUM
-    visible_weight_dope_X_larger_than_threshold_list = [0] * OBJECT_NUM
-    visible_weight_outlier_larger_than_threshold_list = [0] * OBJECT_NUM
-    visible_weight_outlier_smaller_than_threshold_list = [0] * OBJECT_NUM
     x_w_list = [0] * OBJECT_NUM
     y_l_list = [0] * OBJECT_NUM
     z_h_list = [0] * OBJECT_NUM
+    outlier_dis_list = [0] * OBJECT_NUM
+    outlier_ang_list = [0] * OBJECT_NUM
+    
     for obj_index in range(OBJECT_NUM):
         object_name = OBJECT_NAME_LIST[obj_index]
-        if object_name == "cracker":
-            x_w_list[obj_index] = 0.159
-            y_l_list[obj_index] = 0.21243700408935547
-            z_h_list[obj_index] = 0.06
-            visible_threshold_dope_X_list[obj_index] = 0.45 # 0.95
-            visible_threshold_dope_X_small_list[obj_index] = 0
-            # visible_threshold_outlier_XS_list[obj_index] = 0.45
-            visible_threshold_outlier_S_list[obj_index] = 0.45
-            visible_threshold_outlier_L_list[obj_index] = 0.6
-            # visible_threshold_outlier_XL_list[obj_index] = 0.6
-            visible_threshold_dope_is_fresh_list[obj_index] = 0.5
-            visible_weight_dope_X_smaller_than_threshold_list[obj_index] = 0.75
-            visible_weight_dope_X_larger_than_threshold_list[obj_index] = 0.45 # 0.05
-            visible_weight_outlier_larger_than_threshold_list[obj_index] = 0.25
-            visible_weight_outlier_smaller_than_threshold_list[obj_index] = 0.45
-            outlier_dis_list[obj_index] = 0.07
-            outlier_ang_list[obj_index] = math.pi * 1 / 4.0
-        elif object_name == "soup":
-            x_w_list[obj_index] = 0.032829689025878906
-            y_l_list[obj_index] = 0.032829689025878906
-            z_h_list[obj_index] = 0.099
-            visible_threshold_dope_X_list[obj_index] = 0.55 # 0.95
-            visible_threshold_dope_X_small_list[obj_index] = 0
-            # visible_threshold_outlier_XS_list[obj_index] = 0.3
-            visible_threshold_outlier_S_list[obj_index] = 0.4
-            visible_threshold_outlier_L_list[obj_index] = 0.65
-            # visible_threshold_outlier_XL_list[obj_index] = 0.75
-            visible_threshold_dope_is_fresh_list[obj_index] = 0.6
-            visible_weight_dope_X_smaller_than_threshold_list[obj_index] = 0.6 # 0.6/0.75
-            visible_weight_dope_X_larger_than_threshold_list[obj_index] = 0.55 # 0.55/0.25
-            visible_weight_outlier_larger_than_threshold_list[obj_index] = 0.25
-            visible_weight_outlier_smaller_than_threshold_list[obj_index] = 0.55
-            outlier_dis_list[obj_index] = 0.07
-            outlier_ang_list[obj_index] = math.pi * 1 / 2.0
-        elif object_name == "Ketchup":
-            x_w_list[obj_index] = 0.145
-            y_l_list[obj_index] = 0.042
-            z_h_list[obj_index] = 0.061
-            visible_threshold_dope_X_list[obj_index] = 0.55 # 0.95
-            visible_threshold_dope_X_small_list[obj_index] = 0
-            # visible_threshold_outlier_XS_list[obj_index] = 0.3
-            visible_threshold_outlier_S_list[obj_index] = 0.4
-            visible_threshold_outlier_L_list[obj_index] = 0.65
-            # visible_threshold_outlier_XL_list[obj_index] = 0.75
-            visible_threshold_dope_is_fresh_list[obj_index] = 0.6
-            visible_weight_dope_X_smaller_than_threshold_list[obj_index] = 0.6 # 0.6/0.75
-            visible_weight_dope_X_larger_than_threshold_list[obj_index] = 0.55 # 0.55/0.25
-            visible_weight_outlier_larger_than_threshold_list[obj_index] = 0.25
-            visible_weight_outlier_smaller_than_threshold_list[obj_index] = 0.55
-            outlier_dis_list[obj_index] = 0.07
-            outlier_ang_list[obj_index] = math.pi * 1 / 2.0
-        elif object_name == "Milk":
-            x_w_list[obj_index] = 0.179934
-            y_l_list[obj_index] = 0.0613
-            z_h_list[obj_index] = 0.0613
-            visible_threshold_dope_X_list[obj_index] = 0.55 # 0.95
-            visible_threshold_dope_X_small_list[obj_index] = 0
-            # visible_threshold_outlier_XS_list[obj_index] = 0.3
-            visible_threshold_outlier_S_list[obj_index] = 0.4
-            visible_threshold_outlier_L_list[obj_index] = 0.65
-            # visible_threshold_outlier_XL_list[obj_index] = 0.75
-            visible_threshold_dope_is_fresh_list[obj_index] = 0.6
-            visible_weight_dope_X_smaller_than_threshold_list[obj_index] = 0.6 # 0.6/0.75
-            visible_weight_dope_X_larger_than_threshold_list[obj_index] = 0.55 # 0.55/0.25
-            visible_weight_outlier_larger_than_threshold_list[obj_index] = 0.25
-            visible_weight_outlier_smaller_than_threshold_list[obj_index] = 0.55
-            outlier_dis_list[obj_index] = 0.07
-            outlier_ang_list[obj_index] = math.pi * 1 / 2.0
-        elif object_name == "Mustard":
-            x_w_list[obj_index] = 0.14
-            y_l_list[obj_index] = 0.038
-            z_h_list[obj_index] = 0.055
-            visible_threshold_dope_X_list[obj_index] = 0.55 # 0.95
-            visible_threshold_dope_X_small_list[obj_index] = 0
-            # visible_threshold_outlier_XS_list[obj_index] = 0.3
-            visible_threshold_outlier_S_list[obj_index] = 0.4
-            visible_threshold_outlier_L_list[obj_index] = 0.65
-            # visible_threshold_outlier_XL_list[obj_index] = 0.75
-            visible_threshold_dope_is_fresh_list[obj_index] = 0.6
-            visible_weight_dope_X_smaller_than_threshold_list[obj_index] = 0.6 # 0.6/0.75
-            visible_weight_dope_X_larger_than_threshold_list[obj_index] = 0.50 # 0.55/0.25
-            visible_weight_outlier_larger_than_threshold_list[obj_index] = 0.25
-            visible_weight_outlier_smaller_than_threshold_list[obj_index] = 0.55
-            outlier_dis_list[obj_index] = 0.07
-            outlier_ang_list[obj_index] = math.pi * 1 / 2.0
-        elif object_name == "Mayo":
-            x_w_list[obj_index] = 0.1377716
-            y_l_list[obj_index] = 0.0310130
-            z_h_list[obj_index] = 0.054478
-            visible_threshold_dope_X_list[obj_index] = 0.55 # 0.95
-            visible_threshold_dope_X_small_list[obj_index] = 0
-            # visible_threshold_outlier_XS_list[obj_index] = 0.3
-            visible_threshold_outlier_S_list[obj_index] = 0.4
-            visible_threshold_outlier_L_list[obj_index] = 0.65
-            # visible_threshold_outlier_XL_list[obj_index] = 0.75
-            visible_threshold_dope_is_fresh_list[obj_index] = 0.6
-            visible_weight_dope_X_smaller_than_threshold_list[obj_index] = 0.6 # 0.6/0.75
-            visible_weight_dope_X_larger_than_threshold_list[obj_index] = 0.55 # 0.55/0.25
-            visible_weight_outlier_larger_than_threshold_list[obj_index] = 0.25
-            visible_weight_outlier_smaller_than_threshold_list[obj_index] = 0.55
-            outlier_dis_list[obj_index] = 0.07
-            outlier_ang_list[obj_index] = math.pi * 1 / 2.0
-        elif object_name == "Parmesan":
-            x_w_list[obj_index] = 0.0929022
-            y_l_list[obj_index] = 0.0592842
-            z_h_list[obj_index] = 0.0592842
-            visible_threshold_dope_X_list[obj_index] = 0.55 # 0.95
-            visible_threshold_dope_X_small_list[obj_index] = 0
-            # visible_threshold_outlier_XS_list[obj_index] = 0.3
-            visible_threshold_outlier_S_list[obj_index] = 0.4
-            visible_threshold_outlier_L_list[obj_index] = 0.65
-            # visible_threshold_outlier_XL_list[obj_index] = 0.75
-            visible_threshold_dope_is_fresh_list[obj_index] = 0.6
-            visible_weight_dope_X_smaller_than_threshold_list[obj_index] = 0.6 # 0.6/0.75
-            visible_weight_dope_X_larger_than_threshold_list[obj_index] = 0.45 # 0.55/0.25
-            visible_weight_outlier_larger_than_threshold_list[obj_index] = 0.25
-            visible_weight_outlier_smaller_than_threshold_list[obj_index] = 0.55
-            outlier_dis_list[obj_index] = 0.07
-            outlier_ang_list[obj_index] = math.pi * 1 / 2.0
-        elif object_name == "SaladDressing":
-            x_w_list[obj_index] = 0.1375274
-            y_l_list[obj_index] = 0.036266
-            z_h_list[obj_index] = 0.052722
-            visible_threshold_dope_X_list[obj_index] = 0.55 # 0.95
-            visible_threshold_dope_X_small_list[obj_index] = 0
-            # visible_threshold_outlier_XS_list[obj_index] = 0.3
-            visible_threshold_outlier_S_list[obj_index] = 0.4
-            visible_threshold_outlier_L_list[obj_index] = 0.65
-            # visible_threshold_outlier_XL_list[obj_index] = 0.75
-            visible_threshold_dope_is_fresh_list[obj_index] = 0.6
-            visible_weight_dope_X_smaller_than_threshold_list[obj_index] = 0.6 # 0.6/0.75
-            visible_weight_dope_X_larger_than_threshold_list[obj_index] = 0.55 # 0.55/0.25
-            visible_weight_outlier_larger_than_threshold_list[obj_index] = 0.25
-            visible_weight_outlier_smaller_than_threshold_list[obj_index] = 0.55
-            outlier_dis_list[obj_index] = 0.07
-            outlier_ang_list[obj_index] = math.pi * 1 / 2.0
-        else: # gelatin
-            x_w_list[obj_index] = 0.159
-            y_l_list[obj_index] = 0.21243700408935547
-            z_h_list[obj_index] = 0.06
-            visible_threshold_dope_X_list[obj_index] = 0.95
-            visible_threshold_dope_X_small_list[obj_index] = 0
-            visible_threshold_outlier_S_list[obj_index] = 0.4
-            visible_threshold_outlier_L_list[obj_index] = 0.5
-            visible_threshold_dope_is_fresh_list[obj_index] = 0.5
-            visible_weight_dope_X_smaller_than_threshold_list[obj_index] = 0.75
-            visible_weight_dope_X_larger_than_threshold_list[obj_index] = 0.25
-            visible_weight_outlier_larger_than_threshold_list[obj_index] = 0.25
-            visible_weight_outlier_smaller_than_threshold_list[obj_index] = 0.45
-            outlier_dis_list[obj_index] = 0.05
-            outlier_ang_list[obj_index] = math.pi * 1 / 4.0
+        x_w_list[obj_index] = OBJ_SHAPE[object_name]['x_w']
+        y_l_list[obj_index] = OBJ_SHAPE[object_name]['y_l']
+        z_h_list[obj_index] = OBJ_SHAPE[object_name]['z_h']
+        outlier_dis_list[obj_index] = OBJ_OUTLIER_STANDARD[object_name]['dis']
+        outlier_ang_list[obj_index] = OBJ_OUTLIER_STANDARD[object_name]['ang']
     # ============================================================================
 
     while not rospy.is_shutdown():
 
         dope_detection_flag_list = [0] * OBJECT_NUM
-        global_objects_visual_by_DOPE_list = [0] * OBJECT_NUM
-        global_objects_outlier_by_DOPE_list = [0] * OBJECT_NUM
+        global_objects_visual_by_OBSE_list = [0] * OBJECT_NUM
+        global_objects_outlier_by_OBSE_list = [0] * OBJECT_NUM
 
         temp_pw_T_obj_obse_objs_list = []
         temp_pw_T_obj_opti_objs_list = []
@@ -1756,27 +1610,16 @@ if __name__ == '__main__':
             pw_T_obj_GT_pose = []
         for obj_index in range(OBJECT_NUM):
             object_name = OBJECT_NAME_LIST[obj_index]
-            if object_name == "soup2":
-                object_name = "soup"
             use_gazebo = ""
             if gazebo_flag == True:
                 use_gazebo = '_noise'
             try:
                 latest_obse_time = _tf_listener.getLatestCommonTime('/panda_link0', '/'+object_name+use_gazebo)
                 latest_obse_time_list[obj_index] = latest_obse_time
-
-                # old_obse_time = latest_obse_time.to_sec()
-                # if (rospy.get_time() - latest_obse_time.to_sec()) < 0.1:
-                #     (trans_ob,rot_ob) = _tf_listener.lookupTransform('/panda_link0', '/'+object_name+use_gazebo, rospy.Time(0))
-                #     print("obse is FRESH")
-
-                # if check_dope_work_flag_init_list[obj_index] == 0:
-                #     check_dope_work_flag_init_list[obj_index] = 1
-                #     old_obse_time_list[obj_index] = latest_obse_time_list[obj_index].to_sec()
                 
                 if (latest_obse_time_list[obj_index].to_sec() > old_obse_time_list[obj_index]):
                     (trans_ob,rot_ob) = _tf_listener.lookupTransform('/panda_link0', '/'+object_name+use_gazebo, rospy.Time(0))
-                    global_objects_visual_by_DOPE_list[obj_index] = 0
+                    global_objects_visual_by_OBSE_list[obj_index] = 0
                     t_after = time.time()
                     trans_ob_list[obj_index] = trans_ob
                     rot_ob_list[obj_index] = rot_ob
@@ -1784,8 +1627,8 @@ if __name__ == '__main__':
                     # print("obse is FRESH:", obj_index)
                 else:
                     # obse has not been updating for a while
-                    global_objects_visual_by_DOPE_list[obj_index] = 1
-                    global_objects_outlier_by_DOPE_list[obj_index] = 1
+                    global_objects_visual_by_OBSE_list[obj_index] = 1
+                    global_objects_outlier_by_OBSE_list[obj_index] = 1
                     # print("obse is NOT fresh:", obj_index)
                 old_obse_time_list[obj_index] = latest_obse_time_list[obj_index].to_sec()
                 # break
@@ -1805,22 +1648,19 @@ if __name__ == '__main__':
             pw_T_obj_obse_pos = [pw_T_obj_obse[0][3], pw_T_obj_obse[1][3], pw_T_obj_obse[2][3]]
             pw_T_obj_obse_ori = transformations.quaternion_from_matrix(pw_T_obj_obse)
             
-            # pw_T_esti_obj_pose_old = estimated_object_set_old_list[obj_index]
-
-            # dis_obseCur_estiOld = compute_pos_err_bt_2_points(pw_T_obj_obse_pos, pw_T_esti_obj_pose_old[0])
-            # ang_obseCur_estiOld = compute_ang_err_bt_2_points(pw_T_obj_obse_ori, pw_T_esti_obj_pose_old[1])
             pw_T_obj_obse_pose_new = [pw_T_obj_obse_pos, pw_T_obj_obse_ori]
 
             minDis_obseCur_parOld, minAng_obseCur_parOld = find_closest_pose_metrics(obj_index, _particle_cloud_pub, pw_T_obj_obse_pose_new)            
 
             if run_alg_flag == "PBPF":
-                # if dis_obseCur_estiOld > dis_std_list[obj_index] or ang_obseCur_estiOld > ang_std_list[obj_index]
-                # "dis_std_list": the mean distance value from each PARTICLE to the OBSE pose
                 if minDis_obseCur_parOld > outlier_dis_list[obj_index] or minAng_obseCur_parOld > outlier_ang_list[obj_index]:
-                    global_objects_outlier_by_DOPE_list[obj_index] = 1
-
+                    global_objects_outlier_by_OBSE_list[obj_index] = 1
+                else:
+                    assert run_alg_flag == "PBPF", "Not Done"
+            else:
+                assert run_alg_flag == "PBPF", "Not Done"
             # only for drawing BOX/ need to change
-            if publish_DOPE_pose_flag == True:
+            if publish_OBSE_pose_flag == True:
                 pose_DOPE = PoseStamped()
                 pose_DOPE.pose.position.x = pw_T_obj_obse_pos[0]
                 pose_DOPE.pose.position.y = pw_T_obj_obse_pos[1]
@@ -1836,6 +1676,7 @@ if __name__ == '__main__':
             temp_pw_T_obj_obse_objs_list.append(obse_object)
 
             if RECORD_RESULTS_FLAG == True:
+                # Only for recording errors
                 obj_name = OBJECT_NAME_LIST[obj_index]
                 opti_T_rob_opti_pos = ROS_LISTENER.listen_2_robot_pose()[0]
                 opti_T_rob_opti_ori = ROS_LISTENER.listen_2_robot_pose()[1]
@@ -1843,11 +1684,6 @@ if __name__ == '__main__':
                 # if (obj_name == 'cracker') or (obj_name == 'Parmesan') or (obj_name == 'SaladDressing'):
                 #     opti_T_obj_opti_pos = ROS_LISTENER.listen_2_object_pose('soup')[0]
                 #     opti_T_obj_opti_ori = ROS_LISTENER.listen_2_object_pose('soup')[1]
-                # else:    
-                # need to soup
-                # if obj_index == 1:
-                #     opti_T_obj_opti_pos = ROS_LISTENER.listen_2_object_pose(obj_name+'2')[0]
-                #     opti_T_obj_opti_ori = ROS_LISTENER.listen_2_object_pose(obj_name+'2')[1]
                 # else:
                 opti_T_obj_opti_pos = ROS_LISTENER.listen_2_object_pose(obj_name)[0]
                 opti_T_obj_opti_ori = ROS_LISTENER.listen_2_object_pose(obj_name)[1]
@@ -1880,10 +1716,6 @@ if __name__ == '__main__':
                 # if obj_index == 0:
                 #     print(pw_T_obj_obse_pos[1])
 
-        # need to change
-        # temp_pw_T_obj_opti_objs_list_V_list.append(temp_pw_T_obj_opti_objs_list_V)
-        
-        
         _GT_panda_step = _GT_panda_step + 1
         _obse_panda_step = _obse_panda_step + 1
 
@@ -1902,7 +1734,6 @@ if __name__ == '__main__':
         tmp_rot = R.from_quat(tmp_quat)
         rob_link_9_ang_cur = tmp_rot.as_euler('xyz', degrees=False)
         rob_link_9_ang_cur = tuple(rob_link_9_ang_cur)
-
         dis_robcur_robold = compute_pos_err_bt_2_points(rob_link_9_pose_cur[0], rob_link_9_pose_old[0])
                 
         # update according to the pose
@@ -1940,14 +1771,14 @@ if __name__ == '__main__':
                             pass
                         if RUNNING_MODEL == "PBPF_Opti" or RUNNING_MODEL == "PBPF_OptiD":
                         # if RUNNING_MODEL == "PBPF_Opti" or RUNNING_MODEL == "PBPF_OptiD" or RUNNING_MODEL == "PBPF_RGBD":
-                            global_objects_visual_by_DOPE_list = [0] * OBJECT_NUM
-                            global_objects_outlier_by_DOPE_list = [0] *OBJECT_NUM
+                            global_objects_visual_by_OBSE_list = [0] * OBJECT_NUM
+                            global_objects_outlier_by_OBSE_list = [0] *OBJECT_NUM
 
                         print("-------------------------------------")
-                        print("global_objects_visual_by_DOPE_list: -")
-                        print(global_objects_visual_by_DOPE_list)
-                        print("global_objects_outlier_by_DOPE_list:-")
-                        print(global_objects_outlier_by_DOPE_list)
+                        print("global_objects_visual_by_OBSE_list: -")
+                        print(global_objects_visual_by_OBSE_list)
+                        print("global_objects_outlier_by_OBSE_list:-")
+                        print(global_objects_outlier_by_OBSE_list)
                         print("-------------------------------------")
 
 
@@ -2018,14 +1849,13 @@ if __name__ == '__main__':
                             t_before_RGB = time.time()
                             compare_distance_method = "seq" # seq/multi
                             if compare_distance_method == "seq":
-                                if RUNNING_MODEL == "PBPF_Opti" or RUNNING_MODEL == "PBPF_OptiD":
-                                # if RUNNING_MODEL == "PBPF_Opti" or RUNNING_MODEL == "PBPF_OptiD" or RUNNING_MODEL == "PBPF_RGBD":
-                                    _RGB_weights_lists, test_particle_cloud_pub = compare_distance_seq(_particle_cloud_pub, _pw_T_obj_opti_objects_pose_list, global_objects_visual_by_DOPE_list, global_objects_outlier_by_DOPE_list)
+                                if RUNNING_MODEL == "PBPF_Opti" or RUNNING_MODEL == "PBPF_OptiD": # need to have ground truth
+                                    _RGB_weights_lists, test_particle_cloud_pub = compare_distance_seq(_particle_cloud_pub, _pw_T_obj_opti_objects_pose_list, global_objects_visual_by_OBSE_list, global_objects_outlier_by_OBSE_list)
                                 else:
-                                    _RGB_weights_lists, test_particle_cloud_pub = compare_distance_seq(_particle_cloud_pub, _pw_T_obj_obse_objects_pose_list, global_objects_visual_by_DOPE_list, global_objects_outlier_by_DOPE_list)
+                                    _RGB_weights_lists, test_particle_cloud_pub = compare_distance_seq(_particle_cloud_pub, _pw_T_obj_obse_objects_pose_list, global_objects_visual_by_OBSE_list, global_objects_outlier_by_OBSE_list)
                             elif compare_distance_method == "multi":
                                 for env_index, single_env in _single_envs.items():
-                                    single_env.queue.put((SingleENV.compare_distance, env_index, _pw_T_obj_obse_objects_pose_list, global_objects_visual_by_DOPE_list, global_objects_outlier_by_DOPE_list))
+                                    single_env.queue.put((SingleENV.compare_distance, env_index, _pw_T_obj_obse_objects_pose_list, global_objects_visual_by_OBSE_list, global_objects_outlier_by_OBSE_list))
                                 for env_index, single_env in _single_envs.items():
                                     _RGB_weights_list = wait_and_get_result_from(single_env)
                                     _RGB_weights_lists[env_index] = _RGB_weights_list[str(env_index)]
@@ -2114,14 +1944,7 @@ if __name__ == '__main__':
                             print("Time consuming:", One_update_time_consumption)
                             print("Mean value:", np.mean(One_update_time_cosuming_list))
                         simRobot_touch_par_flag = 0
-                        _record_time_consumption = time.time()
-                        time_x = 1.
-                        # _boss_time_consumption_df.loc[_time_record_index] = [_time_record_index, _record_time_consumption - _record_t_begin, 
-                        #                                                      Motion_model_time_consumption/time_x, 
-                        #                                                      Render_depth_image_time_consumption/time_x, Compare_depth_image_time_consumption/time_x, 
-                        #                                                      Compare_distance_time_consumption/time_x, Compute_visibility_score_time_consumption/time_x,
-                        #                                                      Resample_time_consumption/time_x, Deepcopy_time_consumption/time_x, Setpub_time_consumption/time_x, Observation_model_time_consumption/time_x,
-                        #                                                      One_update_time_consumption/time_x]      
+                        _record_time_consumption = time.time()    
                         _boss_time_consumption_df.loc[_time_record_index] = [_time_record_index, _record_time_consumption - _record_t_begin, 
                                                                              Motion_model_time_consumption, 
                                                                              Render_depth_image_time_consumption, Compare_depth_image_time_consumption, 

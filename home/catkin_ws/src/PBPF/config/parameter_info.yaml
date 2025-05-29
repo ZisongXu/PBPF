@@ -23,6 +23,51 @@ ignore_edge_pixels: false
 locate_camera_flag: ar
 multiprocessing_flag: false
 nearVal: 0.03
+obj_VisibleScore_obse_fail_threshold_high:
+  Ketchup: 0.55
+  Mayo: 0.55
+  Milk: 0.55
+  Mustard: 0.55
+  Parmesan: 0.55
+  SaladDressing: 0.55
+  cracker: 0.45
+  soup: 0.55
+obj_VisibleScore_obse_fail_threshold_low:
+  Ketchup: 0.0
+  Mayo: 0.0
+  Milk: 0.0
+  Mustard: 0.0
+  Parmesan: 0.0
+  SaladDressing: 0.0
+  cracker: 0.0
+  soup: 0.0
+obj_VisibleScore_obse_fail_weight_high:
+  Ketchup: 0.6
+  Mayo: 0.6
+  Milk: 0.6
+  Mustard: 0.6
+  Parmesan: 0.6
+  SaladDressing: 0.6
+  cracker: 0.75
+  soup: 0.6
+obj_VisibleScore_obse_fail_weight_low:
+  Ketchup: 0.55
+  Mayo: 0.55
+  Milk: 0.55
+  Mustard: 0.55
+  Parmesan: 0.55
+  SaladDressing: 0.55
+  cracker: 0.45
+  soup: 0.55
+obj_VisibleScore_obse_work_threshold:
+  Ketchup: 0.6
+  Mayo: 0.6
+  Milk: 0.6
+  Mustard: 0.6
+  Parmesan: 0.6
+  SaladDressing: 0.6
+  cracker: 0.5
+  soup: 0.6
 obj_friction_mean_dict:
   Ketchup: 0.1
   Mayo: 0.1
@@ -82,8 +127,66 @@ obj_mass_sigma_dict:
 obj_motion_model_ang_noise: 0.05
 obj_motion_model_noise_flag: true
 obj_motion_model_pos_noise: 0.005
+obj_outlier_standard:
+  Ketchup:
+    ang: 1.5707963
+    dis: 0.07
+  Mayo:
+    ang: 1.5707963
+    dis: 0.07
+  Milk:
+    ang: 1.5707963
+    dis: 0.07
+  Mustard:
+    ang: 1.5707963
+    dis: 0.07
+  Parmesan:
+    ang: 1.5707963
+    dis: 0.07
+  SaladDressing:
+    ang: 1.5707963
+    dis: 0.07
+  cracker:
+    ang: 0.78539815
+    dis: 0.07
+  soup:
+    ang: 1.5707963
+    dis: 0.07
 obj_restitution_mean: 0.9
 obj_restitution_sigma: 0.2
+obj_shape:
+  Ketchup:
+    x_w: 0.145
+    y_l: 0.042
+    z_h: 0.061
+  Mayo:
+    x_w: 0.1377716
+    y_l: 0.031013
+    z_h: 0.054478
+  Milk:
+    x_w: 0.179934
+    y_l: 0.0613
+    z_h: 0.0613
+  Mustard:
+    x_w: 0.14
+    y_l: 0.038
+    z_h: 0.055
+  Parmesan:
+    x_w: 0.0929022
+    y_l: 0.0592842
+    z_h: 0.0592842
+  SaladDressing:
+    x_w: 0.1375274
+    y_l: 0.036266
+    z_h: 0.052722
+  cracker:
+    x_w: 0.159
+    y_l: 0.21243700408935548
+    z_h: 0.06
+  soup:
+    x_w: 0.032829689025878905
+    y_l: 0.032829689025878905
+    z_h: 0.099
 obj_sigma_ang_for_obs_weight_dict:
   Ketchup: 0.2
   Mayo: 0.2
