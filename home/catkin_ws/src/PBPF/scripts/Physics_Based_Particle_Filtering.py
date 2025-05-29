@@ -71,7 +71,6 @@ from Visualisation_World import Visualisation_World
 from Create_Scene import Create_Scene
 from Object_Pose import Object_Pose
 from Robot_Pose import Robot_Pose
-from launch_camera import LaunchCamera
 from PyBulletEnv import PyBulletEnv
 
 _record_t_begin = time.time()
@@ -1354,6 +1353,18 @@ if __name__ == '__main__':
     if run_alg_flag == 'CVPF':
         PARTICLE_NUM = 150
     
+
+
+    # ============================================================================
+
+    # set physics simulation
+    if PHYSICS_SIMULATION == "pybullet":
+        phy_ENV = PyBulletEnv(parameter_info)
+    elif PHYSICS_SIMULATION == "mujoco":
+        pass
+    else:
+        pass
+        
     # ============================================================================
 
     # get camera intrinsic info
@@ -1414,7 +1425,6 @@ if __name__ == '__main__':
     _tf_listener = tf.TransformListener()
     
     create_scene = Create_Scene(OBJECT_NUM, ROBOT_NUM)
-    _launch_camera = LaunchCamera(WIDTH_DEPTH, HEIGHT_DEPTH, FOV_V_DEPTH)
     
     pw_T_rob_sim_pose_list_alg = create_scene.initialize_robot()
     # Here, because we are using only one robot so we use [0]
@@ -1424,7 +1434,7 @@ if __name__ == '__main__':
     print(_pw_T_rob_sim_4_4)
     print("========================")
     # get cameraDepth pose
-    _pw_T_camD_tf_4_4 = _launch_camera.getCameraInPybulletWorldPose44(_tf_listener, _pw_T_rob_sim_4_4)
+    _pw_T_camD_tf_4_4 = phy_ENV.getCameraInPybulletWorldPose44(_tf_listener, _pw_T_rob_sim_4_4)
     print("========================")
     print("Camera depth len pose in Pybullet world:")
     print(_pw_T_camD_tf_4_4)
@@ -1438,12 +1448,6 @@ if __name__ == '__main__':
     # ============================================================================
 
     # cpu parallel
-    if PHYSICS_SIMULATION == "pybullet":
-        phy_ENV = PyBulletEnv(parameter_info)
-    elif PHYSICS_SIMULATION == "mujoco":
-        pass
-    else:
-        pass
     _single_envs = create_particles(phy_ENV,
                                     pw_T_rob_sim_pose_list_alg, pw_T_obj_obse_obj_list_alg
                                     )

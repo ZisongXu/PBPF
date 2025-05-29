@@ -8,6 +8,7 @@ from pybullet_utils import bullet_client as bc
 import math
 import random
 import os
+import numpy as np
 # 
 from pyquaternion import Quaternion
 #
@@ -16,6 +17,10 @@ from quaternion_averaging import weightedAverageQuaternions
 from Particle import Particle
 from Object_Pose import Object_Pose
 from PhysicsEnv import PhysicsEnv
+# ros
+import tf
+import tf.transformations as transformations
+import rospy
 
 class PyBulletEnv(PhysicsEnv):
     def __init__(self, parameter_info, **kwargs):
@@ -35,17 +40,20 @@ class PyBulletEnv(PhysicsEnv):
     
         self.PF_UPDATE_INTERVAL_IN_SIM = self.PF_UPDATE_FREQUENCY[self.RUN_ALG_FLAG] / self.SIM_TIME_STEP
         
-        self.gazebo_flag = self.parameter_info['gazebo_flag']
-        self.task_flag = self.parameter_info['task_flag']
+        self.OPTITRACK_FLAG = self.parameter_info['optitrack_flag']
+        self.GAZEBO_FLAG = self.parameter_info['gazebo_flag']
+        self.LOCATE_CAMERA_FLAG = self.parameter_info['locate_camera_flag']
+        self.TASK_FLAG = self.parameter_info['task_flag']
         self.SIM_REAL_WORLD_FLAG = self.parameter_info['sim_real_world_flag']
         self.SHOW_RAY = self.parameter_info['show_ray'] 
         self.OBJECT_NAME_LIST = self.parameter_info['object_name_list']
         self.OBJECT_NUM = self.parameter_info['object_num']
         self.PARTICLE_NUM = self.parameter_info['particle_num']
-        
+
         self.PANDA_ROBOT_LINK_NUMBER = self.parameter_info['panda_robot_link_number']
         self.MASS_marker = self.parameter_info['MASS_marker']
         self.FRICTION_marker = self.parameter_info['FRICTION_marker']
+        
         
         # ============================================================================
 
@@ -124,7 +132,7 @@ class PyBulletEnv(PhysicsEnv):
     
     def add_static_obstacles(self):
         plane_id = self.p_env.loadURDF("plane.urdf")
-        if self.task_flag == "1":
+        if self.TASK_FLAG == "1":
             pw_T_pringles_pos = [0.6652218209791124, 0.058946644391304814, 0.8277292172960276]
             pw_T_pringles_ori = [ 0.67280124, -0.20574896, -0.20600051, 0.68012472] # x, y, z, w
             pringles_id = self.p_env.loadURDF(os.path.expanduser("~/project/object/others/pringles.urdf"),
@@ -174,7 +182,7 @@ class PyBulletEnv(PhysicsEnv):
                                                                    self.sigma_obs_x_for_init, self.sigma_obs_y_for_init, self.sigma_obs_z_for_init,
                                                                    self.sigma_obs_ang_for_init)
             gazebo_contain = ""
-            if self.gazebo_flag == True:
+            if self.GAZEBO_FLAG == True:
                 gazebo_contain = "gazebo_"
             if obj_obse_name == "soup2":
                 obj_obse_name = "soup"
@@ -266,8 +274,7 @@ class PyBulletEnv(PhysicsEnv):
         # collision check: add robot
         collision_detection_obj_id_.append(self.robot_id)
         # collision check: add board
-        if self.task_flag != "4": # slope 
-            collision_detection_obj_id_.append(self.board_id_1)
+        collision_detection_obj_id_.append(self.board_id_1)
         # collision check
         for obj_index in range(self.OBJECT_NUM):
             obj_id = self.objects_list[obj_index].no_visual_par_id
@@ -562,3 +569,41 @@ class PyBulletEnv(PhysicsEnv):
                                 spinningFriction = spinningFriction, 
                                 rollingFriction = self.OBJ_FRICTION_MIN_MEAN_DICT[obj_name], 
                                 restitution = restitution)
+
+    def getCameraInPybulletWorldPose44(self, tf_listener, pw_T_rob_sim_4_4):
+        if self.OPTITRACK_FLAG == True and self.LOCATE_CAMERA_FLAG == "opti":
+            realsense_tf = '/RealSense' # (use Optitrack)
+        else:
+            realsense_tf = '/ar_tracking_camera_frame' # (do not use Optitrack)
+        if self.GAZEBO_FLAG == True:
+            realsense_tf = '/realsense_camera'
+        # mark
+        while_time = 0
+        while True:
+            while_time = while_time + 1
+            if while_time > 1000:
+                # print("In launch_camera.py: Can not find the pose of the camera!!!! You need to wait a while or try to debug")
+                pass
+            try:
+                (trans_camera, rot_camera) = tf_listener.lookupTransform('/panda_link0', realsense_tf, rospy.Time(0))
+                break
+            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+                continue
+        camRGB_T_camD_tf_pos = [0.015, 0.0, 0.0]
+        camRGB_T_camD_tf_ori = [0.0, 0.0, -0.008, 1] # x, y, z, w
+
+        camRGB_T_camD_tf_3_3 = np.array(p.getMatrixFromQuaternion(camRGB_T_camD_tf_ori)).reshape(3, 3)
+        camRGB_T_camD_tf_3_4 = np.c_[camRGB_T_camD_tf_3_3, camRGB_T_camD_tf_pos]  # Add position to create 3x4 matrix
+        camRGB_T_camD_tf_4_4 = np.r_[camRGB_T_camD_tf_3_4, [[0, 0, 0, 1]]]  # Convert to 4x4 homogeneous matrix
+
+        rob_T_camRGB_tf_pos = list(trans_camera)
+        rob_T_camRGB_tf_ori = list(rot_camera)
+        rob_T_camRGB_tf_3_3 = np.array(p.getMatrixFromQuaternion(rob_T_camRGB_tf_ori)).reshape(3, 3)
+        rob_T_camRGB_tf_3_4 = np.c_[rob_T_camRGB_tf_3_3, rob_T_camRGB_tf_pos]  # Add position to create 3x4 matrix
+        rob_T_camRGB_tf_4_4 = np.r_[rob_T_camRGB_tf_3_4, [[0, 0, 0, 1]]]  # Convert to 4x4 homogeneous matrix
+
+        rob_T_camD_tf_4_4 = np.dot(rob_T_camRGB_tf_4_4, camRGB_T_camD_tf_4_4)
+        self.pw_T_camD_tf_4_4 = np.dot(pw_T_rob_sim_4_4, rob_T_camD_tf_4_4)
+        self.compute_cam_pose_flag = 1
+
+        return self.pw_T_camD_tf_4_4 
