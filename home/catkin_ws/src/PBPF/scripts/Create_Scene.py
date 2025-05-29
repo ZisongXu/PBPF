@@ -19,12 +19,9 @@ from geometry_msgs.msg import Point, PointStamped, PoseStamped, Quaternion, Tran
 import tf
 import tf.transformations as transformations
 from visualization_msgs.msg import Marker
-#pybullet
+# 
 from pyquaternion import Quaternion
-import pybullet as p
 import time
-import pybullet_data
-from pybullet_utils import bullet_client as bc
 import numpy as np
 import math
 import random

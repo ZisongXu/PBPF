@@ -32,11 +32,12 @@ from cv_bridge import CvBridgeError
 import message_filters
 import cv2
 #pybullet
+# import pybullet as p
+# import pybullet_data
+# from pybullet_utils import bullet_client as bc
+# 
 from pyquaternion import Quaternion
-import pybullet as p
 import time
-import pybullet_data
-from pybullet_utils import bullet_client as bc
 import numpy as np
 import matplotlib.pyplot as plt
 import math
@@ -439,8 +440,10 @@ def _publish_par_pose_info(particle_cloud_pub):
                 _par_panda_step = _par_panda_step + 1
     
             pw_T_par_pos = [obj_info.pos[0], obj_info.pos[1], obj_info.pos[2]]
-            pw_T_par_ori = [obj_info.ori[0], obj_info.ori[1], obj_info.ori[2], obj_info.ori[3]]
-            pw_T_par_3_3 = np.array(p.getMatrixFromQuaternion(pw_T_par_ori)).reshape(3, 3)
+            pw_T_par_ori = [obj_info.ori[0], obj_info.ori[1], obj_info.ori[2], obj_info.ori[3]] # x,y,z,w
+            pw_T_par_ori_anti = [obj_info.ori[3], obj_info.ori[0], obj_info.ori[1], obj_info.ori[2]] # w,x,y,z
+            tmp_q = Quaternion(pw_T_par_ori_anti)
+            pw_T_par_3_3 = tmp_q.rotation_matrix
             pw_T_par_3_4 = np.c_[pw_T_par_3_3, pw_T_par_pos]  # Add position to create 3x4 matrix
             pw_T_par_4_4 = np.r_[pw_T_par_3_4, [[0, 0, 0, 1]]]  # Convert to 4x4 homogeneous matrix
             rob_T_pw_4_4 = np.linalg.inv(_pw_T_rob_sim_4_4)
@@ -1353,8 +1356,6 @@ if __name__ == '__main__':
     if run_alg_flag == 'CVPF':
         PARTICLE_NUM = 150
     
-
-
     # ============================================================================
 
     # set physics simulation
@@ -1501,8 +1502,10 @@ if __name__ == '__main__':
             continue
     print("Finish getting pose of camera!")
     rob_T_cam_tf_pos = list(trans_camera)
-    rob_T_cam_tf_ori = list(rot_camera)
-    rob_T_cam_tf_3_3 = np.array(p.getMatrixFromQuaternion(rob_T_cam_tf_ori)).reshape(3, 3)
+    rob_T_cam_tf_ori = list(rot_camera) # x,y,z,w
+    rob_T_cam_tf_ori_anti = [rob_T_cam_tf_ori[3], rob_T_cam_tf_ori[0], rob_T_cam_tf_ori[1], rob_T_cam_tf_ori[2]] # w,x,y,z
+    tmp_q = Quaternion(rob_T_cam_tf_ori_anti)
+    rob_T_cam_tf_3_3 = tmp_q.rotation_matrix
     rob_T_cam_tf_3_4 = np.c_[rob_T_cam_tf_3_3, rob_T_cam_tf_pos]  # Add position to create 3x4 matrix
     rob_T_cam_tf_4_4 = np.r_[rob_T_cam_tf_3_4, [[0, 0, 0, 1]]]  # Convert to 4x4 homogeneous matrix
     pw_T_cam_tf = np.dot(_pw_T_rob_sim_4_4, rob_T_cam_tf_4_4)
