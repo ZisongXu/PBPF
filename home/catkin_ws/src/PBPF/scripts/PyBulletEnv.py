@@ -160,6 +160,8 @@ class PyBulletEnv(PhysicsEnv):
             board_ori_1 = self.p_env.getQuaternionFromEuler([math.pi/2,math.pi/2,0])
             self.board_id_1 = self.p_env.loadURDF(os.path.expanduser("~/project/object/others/board.urdf"), board_pos_1, board_ori_1, useFixedBase = 1)
             self.collision_detection_obj_id_collection.append(self.board_id_1)
+        else:
+            pass
 
     def add_robot(self):
         real_robot_start_pos = self.pw_T_rob_sim_pose_list_alg[0].pos
@@ -607,3 +609,57 @@ class PyBulletEnv(PhysicsEnv):
         self.compute_cam_pose_flag = 1
 
         return self.pw_T_camD_tf_4_4 
+
+    #################################################################
+
+    def create_new_physicsEnv_Z(self, pw_T_rob_sim_pose_list_alg):
+        """
+        get pose of the end-effector of the robot arm from joints of robot arm
+        """
+        self.p_track_fk_env = bc.BulletClient(connection_mode=p.DIRECT) # DIRECT, GUI_SERVER
+        self.p_track_fk_env.setAdditionalSearchPath(pybullet_data.getDataPath())
+        
+        real_robot_start_pos = pw_T_rob_sim_pose_list_alg[0].pos
+        real_robot_start_ori = pw_T_rob_sim_pose_list_alg[0].ori
+
+        self.track_fk_rob_id = self.p_track_fk_env.loadURDF(os.path.expanduser("~/project/data/bullet3-master/examples/pybullet/gym/pybullet_data/franka_panda/panda.urdf"),
+                                                            real_robot_start_pos,
+                                                            real_robot_start_ori,
+                                                            useFixedBase=1)
+
+    def move_rob_in_Z(self, joint_states):
+        """
+        move the joint state of the robot in the fake env world 
+        """
+        num_joints = 9
+        for joint_index in range(num_joints):
+            if joint_index == 7 or joint_index == 8:
+                self.p_track_fk_env.resetJointState(self.track_fk_rob_id,
+                                                    joint_index+2,
+                                                    targetValue=joint_states[joint_index])
+            else:
+                self.p_track_fk_env.resetJointState(self.track_fk_rob_id,
+                                                    joint_index,
+                                                    targetValue=joint_states[joint_index])
+
+    def get_rob_end_effector_state_in_Z(self):
+        rob_link_9_pose = self.p_track_fk_env.getLinkState(self.track_fk_rob_id, 9)
+        return rob_link_9_pose
+    
+    def get_all_rob_links_info_in_Z(self):
+        all_links_info = self.p_track_fk_env.getLinkStates(self.track_fk_rob_id, range(self.PANDA_ROBOT_LINK_NUMBER + 2), computeForwardKinematics=True) # 11+2; range: [0,13)
+        return all_links_info
+
+    def get_rob_base_state_in_Z(self):
+        base_link_info = self.p_track_fk_env.getBasePositionAndOrientation(self.track_fk_rob_id) # base (link0)
+        return base_link_info
+        
+
+
+
+
+
+
+
+
+

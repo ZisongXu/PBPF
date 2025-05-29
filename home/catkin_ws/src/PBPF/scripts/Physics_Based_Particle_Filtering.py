@@ -31,17 +31,14 @@ from cv_bridge import CvBridge
 from cv_bridge import CvBridgeError
 import message_filters
 import cv2
-#pybullet
-# import pybullet as p
-# import pybullet_data
-# from pybullet_utils import bullet_client as bc
 # 
 from pyquaternion import Quaternion
+from scipy.stats import norm
+from scipy.spatial.transform import Rotation as R
 import time
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-from scipy.stats import norm
 import random
 import copy
 import os
@@ -58,7 +55,6 @@ import yaml
 # from jax import jit
 import heapq
 from collections import namedtuple
-from scipy.spatial.transform import Rotation as R
 
 #from sksurgerycore.algorithms.averagequaternions import average_quaternions
 from quaternion_averaging import weightedAverageQuaternions
@@ -605,41 +601,6 @@ def _compute_estimate_pos_of_object(particle_cloud):
         esti_objs_cloud.append(est_obj_pose)
     return esti_objs_cloud
 
-# ==============================================================================================================================
-
-def track_fk_sim_world():
-    """
-    get pose of the end-effector of the robot arm from joints of robot arm
-    """
-    p_track_fk_env = bc.BulletClient(connection_mode=p.DIRECT) # DIRECT, GUI_SERVER
-    p_track_fk_env.setAdditionalSearchPath(pybullet_data.getDataPath())
-    if SIM_REAL_WORLD_FLAG == True:
-        table_pos_1 = [0.46, -0.01, 0.702]
-    else:
-        table_pos_1 = [0, 0, 0]
-    track_fk_rob_id = p_track_fk_env.loadURDF(os.path.expanduser("~/project/data/bullet3-master/examples/pybullet/gym/pybullet_data/franka_panda/panda.urdf"),
-                                              [0, 0, 0.02+table_pos_1[2]+0.008],
-                                              [0, 0, 0, 1],
-                                              useFixedBase=1)
-    return p_track_fk_env, track_fk_rob_id
-
-def track_fk_world_rob_mv(p_sim, sim_rob_id, joint_states):
-    """
-    move the joint state of the robot in the fake env world 
-    """
-    num_joints = 9
-    for joint_index in range(num_joints):
-        if joint_index == 7 or joint_index == 8:
-            p_sim.resetJointState(sim_rob_id,
-                                  joint_index+2,
-                                  targetValue=joint_states[joint_index])
-        else:
-            p_sim.resetJointState(sim_rob_id,
-                                  joint_index,
-                                  targetValue=joint_states[joint_index])
-
-# ==============================================================================================================================
-
 def _vk_config_setting():
     depth_img_height = RESOLUTION_DEPTH[0] # 480
     depth_img_width = RESOLUTION_DEPTH[1] # 848
@@ -718,25 +679,43 @@ def _vk_load_env_objects_meshes():
     # table
     other_obj_id = _vk_context.load_model("assets/meshes/table.vkdepthmesh")
     vk_other_id_list_.append(other_obj_id)
-    vk_other_obj_info = Object_Pose(obj_name='table', obj_id=0, pos=[0.46, -0.01, 0.702], ori=p.getQuaternionFromEuler([0,0,0]), index=0) # ori: x, y, z, w   
+    rot = R.from_euler('xyz', [0,0,0])
+    table_ori_array = rot.as_quat()
+    table_ori_tuple = tuple(table_ori_array)
+    vk_other_obj_info = Object_Pose(obj_name='table', obj_id=0, pos=[0.46, -0.01, 0.702], ori=table_ori_tuple, index=0) # ori: x, y, z, w   
     vk_other_obj_info_list_.append(vk_other_obj_info)
     # board
     other_obj_id = _vk_context.load_model("assets/meshes/board.vkdepthmesh")
     vk_other_id_list_.append(other_obj_id)
-    vk_other_obj_info = Object_Pose(obj_name='board', obj_id=1, pos=[0.274, 0.581, 0.87575], ori=p.getQuaternionFromEuler([math.pi/2,math.pi/2,0]), index=0) # ori: x, y, z, w           
+    rot = R.from_euler('xyz', [math.pi/2,math.pi/2,0])
+    board_ori_array = rot.as_quat()
+    board_ori_tuple = tuple(board_ori_array)
+    vk_other_obj_info = Object_Pose(obj_name='board', obj_id=1, pos=[0.274, 0.581, 0.87575], ori=board_ori_tuple, index=0) # ori: x, y, z, w           
     vk_other_obj_info_list_.append(vk_other_obj_info)
     # barrier 1,2,3
+    # -----------------------------------------------------------------------
     other_obj_id = _vk_context.load_model("assets/meshes/barrier.vkdepthmesh")
     vk_other_id_list_.append(other_obj_id)
-    vk_other_obj_info = Object_Pose(obj_name='barrier1', obj_id=0, pos=[-0.694, 0.443, 0.895], ori=p.getQuaternionFromEuler([0,math.pi/2,0]), index=0) # ori: x, y, z, w          
+    rot = R.from_euler('xyz', [0,math.pi/2,0])
+    barrier1_ori_array = rot.as_quat()
+    barrier1_ori_tuple = tuple(barrier1_ori_array)
+    vk_other_obj_info = Object_Pose(obj_name='barrier1', obj_id=0, pos=[-0.694, 0.443, 0.895], ori=barrier1_ori_tuple, index=0) # ori: x, y, z, w          
     vk_other_obj_info_list_.append(vk_other_obj_info)
+    # -----------------------------------------------------------------------
     other_obj_id = _vk_context.load_model("assets/meshes/barrier.vkdepthmesh")
     vk_other_id_list_.append(other_obj_id)
-    vk_other_obj_info = Object_Pose(obj_name='barrier2', obj_id=0, pos=[-0.694, -0.607, 0.895], ori=p.getQuaternionFromEuler([0,math.pi/2,0]), index=0) # ori: x, y, z, w          
+    rot = R.from_euler('xyz', [0,math.pi/2,0])
+    barrier2_ori_array = rot.as_quat()
+    barrier2_ori_tuple = tuple(barrier2_ori_array)
+    vk_other_obj_info = Object_Pose(obj_name='barrier2', obj_id=0, pos=[-0.694, -0.607, 0.895], ori=barrier2_ori_tuple, index=0) # ori: x, y, z, w          
     vk_other_obj_info_list_.append(vk_other_obj_info)
+    # -----------------------------------------------------------------------
     other_obj_id = _vk_context.load_model("assets/meshes/barrier.vkdepthmesh")
     vk_other_id_list_.append(other_obj_id)
-    vk_other_obj_info = Object_Pose(obj_name='barrier3', obj_id=0, pos=[0.459, -0.972, 0.895], ori=p.getQuaternionFromEuler([0,math.pi/2,math.pi/2]), index=0) # ori: x, y, z, w          
+    rot = R.from_euler('xyz', [0,math.pi/2,math.pi/2])
+    barrier3_ori_array = rot.as_quat()
+    barrier3_ori_tuple = tuple(barrier3_ori_array)
+    vk_other_obj_info = Object_Pose(obj_name='barrier3', obj_id=0, pos=[0.459, -0.972, 0.895], ori=barrier3_ori_tuple, index=0) # ori: x, y, z, w          
     vk_other_obj_info_list_.append(vk_other_obj_info) 
     # pringles
     if TASK_FLAG == '1':
@@ -761,7 +740,7 @@ def _vk_load_meshes():
     vk_other_id_list, vk_other_obj_info_list = _vk_load_env_objects_meshes()
     return vk_obj_id_list, vk_rob_link_id_list, vk_other_id_list, vk_other_obj_info_list
  
-def _vk_state_setting(vk_particle_cloud, pw_T_camVk_4_4, pybullet_env, par_robot_id):
+def _vk_state_setting(vk_particle_cloud, pw_T_camVk_4_4, all_links_info, base_link_info):
     """
     particle setting
     """
@@ -801,18 +780,18 @@ def _vk_state_setting(vk_particle_cloud, pw_T_camVk_4_4, pybullet_env, par_robot
             ########### _vk_context.add_state(vk_single_obj_state)
 
         # vk mark 
-        ## add table/robot... in particle
+        ## add table/robot... in particle 
+        ## all_links_info:
         # There are actually 13 links, of which "link8" and "panda_grasptarget" have no entities.
         ## "link    0,1,2,3,4,5,6,7", "panda_hand", "panda_left_finger", "panda_right_finger"
         # index:    0,1,2,3,4,5,6,7,   9,            10,                  11
         # loop:     0,1,2,3,4,5,6,7,   8,            9,                   10
         # linkstate:x,0,1,2,3,4,5,6,   8,            9,                   10
-        all_links_info = pybullet_env.getLinkStates(par_robot_id, range(PANDA_ROBOT_LINK_NUMBER + 2), computeForwardKinematics=True) # 11+2; range: [0,13)
+        all_links_info
         for rob_link_index in range(PANDA_ROBOT_LINK_NUMBER): # 11: [0, 11)
             if rob_link_index == 0:
-                link_info = pybullet_env.getBasePositionAndOrientation(par_robot_id) # base (link0)
-                vk_T_link_pos = link_info[0]
-                vk_T_link_ori = link_info[1]
+                vk_T_link_pos = base_link_info[0]
+                vk_T_link_ori = base_link_info[1]
             elif rob_link_index < 8 and rob_link_index > 0:
                 link_info = all_links_info[rob_link_index-1]
                 vk_T_link_pos = link_info[4]
@@ -886,10 +865,10 @@ def _vk_depth_image_getting():
     return vk_rendered_depth_image_array_list, vk_rendered__mask_image_array_list, vk_single_obj_rendered__mask_image_array_list
 
 # get rendered depth/seg image model PyBullet
-def _vk_get_rendered_depth_image_parallelised(particle_cloud, links_info):
+def _vk_get_rendered_depth_image_parallelised(particle_cloud, links_info, base_link_info):
     # vk mark 
     ## Update particle pose->update depth image
-    _vk_update_depth_image(_vk_state_list, _vk_single_obj_state_list, particle_cloud, links_info)
+    _vk_update_depth_image(_vk_state_list, _vk_single_obj_state_list, particle_cloud, links_info, base_link_info)
     ## Render and Download
     _vk_context.enqueue_render_and_download(vkdepth.DEPTH | vkdepth.MASK)
     ## Waiting for rendering and download
@@ -910,7 +889,7 @@ def _vk_get_rendered_depth_image_parallelised(particle_cloud, links_info):
     return vk_rendered_depth_image_array_list_, vk_rendered__mask_image_array_list_, vk_single_obj_rendered__mask_image_array_list_
 
 # update vk rendered depth image
-def _vk_update_depth_image(vk_state_list, vk_single_obj_state_list, vk_particle_cloud, all_links_info):
+def _vk_update_depth_image(vk_state_list, vk_single_obj_state_list, vk_particle_cloud, all_links_info, base_link_info):
     for index, particle in enumerate(vk_particle_cloud):
         objs_states = np.array(vk_state_list[index].view(), copy = False)
         for obj_index in range(OBJECT_NUM):
@@ -923,9 +902,8 @@ def _vk_update_depth_image(vk_state_list, vk_single_obj_state_list, vk_particle_
             objs_states[obj_index, 7] = particle[obj_index].ori[2] # z_ori
         for rob_link_index in range(PANDA_ROBOT_LINK_NUMBER):
             if rob_link_index == 0:
-                link_info = p_sim.getBasePositionAndOrientation(sim_rob_id) # base (link0)
-                vk_T_link_pos = link_info[0]
-                vk_T_link_ori = link_info[1]
+                vk_T_link_pos = base_link_info[0]
+                vk_T_link_ori = base_link_info[1]
             elif rob_link_index < 8 and rob_link_index > 0:
                 link_info = all_links_info[rob_link_index-1]
                 vk_T_link_pos = link_info[4] # worldLinkFramePosition
@@ -1517,13 +1495,15 @@ if __name__ == '__main__':
     print(pw_T_cam_tf)
     print("==============================================")        
 
+    # ============================================================================
             
     # get pose of the end-effector of the robot arm from joints of robot arm 
-    p_sim, sim_rob_id = track_fk_sim_world()
-    track_fk_world_rob_mv(p_sim, sim_rob_id, ROS_LISTENER.current_joint_values)
-    rob_link_9_pose_old = p_sim.getLinkState(sim_rob_id, 9) # position = rob_link_9_pose_old[0], quaternion = rob_link_9_pose_old[1]
+    phy_ENV.create_new_physicsEnv_Z(pw_T_rob_sim_pose_list_alg)
+    phy_ENV.move_rob_in_Z(ROS_LISTENER.current_joint_values)
+    rob_link_9_pose_old = phy_ENV.get_rob_end_effector_state_in_Z()
 
     # ============================================================================
+
     # initialisation of vk configuration
     if RENDER_FLAG == 'vk':
         print("Begin initializing vulkon...")
@@ -1547,7 +1527,11 @@ if __name__ == '__main__':
         ## instance -> object
         ## if we have many particles we can create many "q = vkdepth.State()"
         _vk_particle_cloud = copy.deepcopy(_particle_cloud_pub)
-        _vk_state_list, _vk_single_obj_state_list = _vk_state_setting(_vk_particle_cloud, _pw_T_camVk_4_4, p_sim, sim_rob_id)
+
+
+        all_links_info = phy_ENV.get_all_rob_links_info_in_Z()
+        base_link_info = phy_ENV.get_rob_base_state_in_Z()
+        _vk_state_list, _vk_single_obj_state_list = _vk_state_setting(_vk_particle_cloud, _pw_T_camVk_4_4, all_links_info, base_link_info)
         ## Render and Download
         _vk_context.enqueue_render_and_download(vkdepth.DEPTH | vkdepth.MASK)
         ## Waiting for rendering and download
@@ -1765,8 +1749,9 @@ if __name__ == '__main__':
         temp_pw_T_obj_opti_objs_list = []
         temp_pw_T_obj_opti_objs_list_V = []
         # temp_pw_T_obj_opti_objs_list_V_list = []
-        #panda robot moves in the visualization window
-        track_fk_world_rob_mv(p_sim, sim_rob_id, ROS_LISTENER.current_joint_values)
+        #panda robot moves in the ENV Z
+        phy_ENV.move_rob_in_Z(ROS_LISTENER.current_joint_values)
+
         if RECORD_RESULTS_FLAG == True:
             pw_T_obj_GT_pose = []
         for obj_index in range(OBJECT_NUM):
@@ -1808,8 +1793,11 @@ if __name__ == '__main__':
                 print("Main function:", object_name, " can not find TF")
                 
             rob_T_obj_obse_pos = list(trans_ob_list[obj_index])
-            rob_T_obj_obse_ori = list(rot_ob_list[obj_index])
-            rob_T_obj_obse_3_3 = np.array(p.getMatrixFromQuaternion(rob_T_obj_obse_ori)).reshape(3, 3)
+            rob_T_obj_obse_ori = list(rot_ob_list[obj_index]) # x,y,z,W
+
+            rob_T_obj_obse_ori_anti = [rob_T_obj_obse_ori[3], rob_T_obj_obse_ori[0], rob_T_obj_obse_ori[1], rob_T_obj_obse_ori[2]] # w,x,y,z
+            tmp_q = Quaternion(rob_T_obj_obse_ori_anti)
+            rob_T_obj_obse_3_3 = tmp_q.rotation_matrix
             rob_T_obj_obse_3_4 = np.c_[rob_T_obj_obse_3_3, rob_T_obj_obse_pos]  # Add position to create 3x4 matrix
             rob_T_obj_obse_4_4 = np.r_[rob_T_obj_obse_3_4, [[0, 0, 0, 1]]]  # Convert to 4x4 homogeneous matrix
 
@@ -1903,17 +1891,18 @@ if __name__ == '__main__':
         pw_T_obj_opti_objects_list = copy.deepcopy(temp_pw_T_obj_opti_objs_list)
 
         
-        
-        
         if RECORD_RESULTS_FLAG == True:
             _record_obse_pose_first_flag = 1
             _record_obse_pose_list.append(pw_T_obj_obse_objects_list)
             _record_GT_pose_list.append(pw_T_obj_GT_pose)
 
         # compute distance between old robot and cur robot (position and angle)
-        rob_link_9_pose_cur = p_sim.getLinkState(sim_rob_id, 9)
-        rob_link_9_ang_cur = p_sim.getEulerFromQuaternion(rob_link_9_pose_cur[1])
-        
+        rob_link_9_pose_cur = phy_ENV.get_rob_end_effector_state_in_Z()
+        tmp_quat = rob_link_9_pose_cur[1] # x,y,z,w
+        tmp_rot = R.from_quat(tmp_quat)
+        rob_link_9_ang_cur = tmp_rot.as_euler('xyz', degrees=False)
+        rob_link_9_ang_cur = tuple(rob_link_9_ang_cur)
+
         dis_robcur_robold = compute_pos_err_bt_2_points(rob_link_9_pose_cur[0], rob_link_9_pose_old[0])
                 
         # update according to the pose
@@ -1997,8 +1986,9 @@ if __name__ == '__main__':
                             # here, all the links_info should be the same, so I can only get the last one!
                             _links_info = _links_info["links_info"]
 
-                            _vk_get_rendered_depth_image_parallelised(_particle_cloud_pub, _links_info)
-                            # _vk_get_rendered_depth_image_parallelised(_pw_T_obj_opti_objects_pose_list_V, _links_info)
+                            base_link_info = phy_ENV.get_rob_base_state_in_Z()
+                            _vk_get_rendered_depth_image_parallelised(_particle_cloud_pub, _links_info, base_link_info)
+                            
 
                         t_after_render = time.time()
                         Render_depth_image_time_consumption = t_after_render - t_before_render
@@ -2168,7 +2158,6 @@ if __name__ == '__main__':
         t_end_while = time.time()
 
         
-    p_sim.disconnect()
     par_length = len(p_par_env_list)
     for i in range(par_length):
         p_par_env_list[i].disconnect()

@@ -59,3 +59,39 @@ class PhysicsEnv(ABC):
     @abstractmethod
     def change_obj_parameters():
         pass
+
+    @abstractmethod
+    def create_new_physicsEnv_Z():
+        pass
+
+    @abstractmethod
+    def move_rob_in_Z():
+        pass
+
+    @abstractmethod
+    def get_rob_end_effector_state_in_Z():
+        pass
+
+    @abstractmethod
+    def get_all_rob_links_info_in_Z():
+        pass
+        
+    @abstractmethod
+    def get_rob_base_state_in_Z():
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
