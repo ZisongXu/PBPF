@@ -962,9 +962,9 @@ def visibility_computing_vk(particle_cloud, RGB_weights_lists_):
 
                 # weight = particle[obj_index].w
                 weight = RGB_weights_lists_[index][obj_index]
-                local_obj_visual_by_DOPE_val = global_objects_visual_by_OBSE_list[obj_index]
-                local_obj_outlier_by_DOPE_val = global_objects_outlier_by_OBSE_list[obj_index]
-                if local_obj_visual_by_DOPE_val==0 and local_obj_outlier_by_DOPE_val==0:
+                local_obj_visual_by_OBSE_val = global_objects_visual_by_OBSE_list[obj_index]
+                local_obj_outlier_by_OBSE_val = global_objects_outlier_by_OBSE_list[obj_index]
+                if local_obj_visual_by_OBSE_val==0 and local_obj_outlier_by_OBSE_val==0:
                     # visible_score low, weight low
                     if visible_score < OBJ_VISIBLESCORE_OBSE_WORK_THRESHOLD[object_name]:
                         weight = weight / 3.0
@@ -1184,7 +1184,7 @@ def compute_std(mean_pose, particle_cloud):
     ang_std = np.std(ang_list)
     return dis_std, ang_std
 
-def compare_distance_seq(particle_cloud, pw_T_obj_obse_objects_pose_list, visual_by_DOPE_list, outlier_by_DOPE_list):
+def compare_distance_seq(particle_cloud, pw_T_obj_obse_objects_pose_list, visual_by_OBSE_list, outlier_by_OBSE_list):
     weight = 1.0/PARTICLE_NUM
     RGB_weights_lists = [0] * PARTICLE_NUM
     weights_list = [weight] * OBJECT_NUM
@@ -1193,14 +1193,14 @@ def compare_distance_seq(particle_cloud, pw_T_obj_obse_objects_pose_list, visual
         for obj_index in range(OBJECT_NUM):
             particle_cloud[par_index][obj_index].w = weight
         # at least one object is detected by camera
-    if (sum(visual_by_DOPE_list)<OBJECT_NUM) and (sum(outlier_by_DOPE_list)<OBJECT_NUM):
+    if (sum(visual_by_OBSE_list)<OBJECT_NUM) and (sum(outlier_by_OBSE_list)<OBJECT_NUM):
         for par_index in range(PARTICLE_NUM):
             weight = 1.0/PARTICLE_NUM
             weights_list = [weight] * OBJECT_NUM
             for obj_index in range(OBJECT_NUM):
                 weight = 1.0/PARTICLE_NUM
-                obj_visual = visual_by_DOPE_list[obj_index]
-                obj_outlier = outlier_by_DOPE_list[obj_index]
+                obj_visual = visual_by_OBSE_list[obj_index]
+                obj_outlier = outlier_by_OBSE_list[obj_index]
                 if obj_visual==0 and obj_outlier==0:
                     obj_x = particle_cloud[par_index][obj_index].pos[0]
                     obj_y = particle_cloud[par_index][obj_index].pos[1]
@@ -1237,7 +1237,7 @@ def compare_distance_seq(particle_cloud, pw_T_obj_obse_objects_pose_list, visual
     return RGB_weights_lists, particle_cloud
 
 def normal_distribution(x, mean, sigma):
-        return sigma * np.exp(-1*((x-mean)**2)/(2*(sigma**2)))/(math.sqrt(2*np.pi)* sigma)
+    return sigma * np.exp(-1*((x-mean)**2)/(2*(sigma**2)))/(math.sqrt(2*np.pi)* sigma)
     
                             
 
@@ -1376,12 +1376,12 @@ if __name__ == '__main__':
 
     # ============================================================================
 
-    pub_DOPE_list = []
+    pub_OBSE_list = []
     pub_PBPF_list = []
     for obj_index in range(OBJECT_NUM):
-        pub_DOPE = rospy.Publisher('DOPE_pose_'+OBJECT_NAME_LIST[obj_index], PoseStamped, queue_size = 1)
+        pub_OBSE = rospy.Publisher('DOPE_pose_'+OBJECT_NAME_LIST[obj_index], PoseStamped, queue_size = 1)
         pub_PBPF = rospy.Publisher('PBPF_pose_'+OBJECT_NAME_LIST[obj_index], PoseStamped, queue_size = 1)
-        pub_DOPE_list.append(pub_DOPE)
+        pub_OBSE_list.append(pub_OBSE)
         pub_PBPF_list.append(pub_PBPF)
     
     print("This is "+UPDATE_STYLE_FLAG+" update in scene"+TASK_FLAG)    
@@ -1573,9 +1573,7 @@ if __name__ == '__main__':
 
     old_obse_time_list = [0] * OBJECT_NUM
     latest_obse_time_list = [0] * OBJECT_NUM
-    check_dope_work_flag_init_list = [0] * OBJECT_NUM
     
-
     # ============================================================================
     # set parameters
     x_w_list = [0] * OBJECT_NUM
@@ -1595,7 +1593,6 @@ if __name__ == '__main__':
 
     while not rospy.is_shutdown():
 
-        dope_detection_flag_list = [0] * OBJECT_NUM
         global_objects_visual_by_OBSE_list = [0] * OBJECT_NUM
         global_objects_outlier_by_OBSE_list = [0] * OBJECT_NUM
 
@@ -1661,15 +1658,15 @@ if __name__ == '__main__':
                 assert run_alg_flag == "PBPF", "Not Done"
             # only for drawing BOX/ need to change
             if publish_OBSE_pose_flag == True:
-                pose_DOPE = PoseStamped()
-                pose_DOPE.pose.position.x = pw_T_obj_obse_pos[0]
-                pose_DOPE.pose.position.y = pw_T_obj_obse_pos[1]
-                pose_DOPE.pose.position.z = pw_T_obj_obse_pos[2]
-                pose_DOPE.pose.orientation.x = pw_T_obj_obse_ori[0]
-                pose_DOPE.pose.orientation.y = pw_T_obj_obse_ori[1]
-                pose_DOPE.pose.orientation.z = pw_T_obj_obse_ori[2]
-                pose_DOPE.pose.orientation.w = pw_T_obj_obse_ori[3]
-                pub_DOPE_list[obj_index].publish(pose_DOPE)
+                pose_OBSE = PoseStamped()
+                pose_OBSE.pose.position.x = pw_T_obj_obse_pos[0]
+                pose_OBSE.pose.position.y = pw_T_obj_obse_pos[1]
+                pose_OBSE.pose.position.z = pw_T_obj_obse_pos[2]
+                pose_OBSE.pose.orientation.x = pw_T_obj_obse_ori[0]
+                pose_OBSE.pose.orientation.y = pw_T_obj_obse_ori[1]
+                pose_OBSE.pose.orientation.z = pw_T_obj_obse_ori[2]
+                pose_OBSE.pose.orientation.w = pw_T_obj_obse_ori[3]
+                pub_OBSE_list[obj_index].publish(pose_OBSE)
             pw_T_obj_obse_name = object_name
             pw_T_obj_obse_id = 0
             obse_object = Object_Pose(pw_T_obj_obse_name, pw_T_obj_obse_id, pw_T_obj_obse_pos, pw_T_obj_obse_ori, index=obj_index)
@@ -1700,13 +1697,8 @@ if __name__ == '__main__':
                 obj_scene = obj_name+"_scene"+str(TASK_FLAG)
                 _record_t = time.time()
                 # x, y, z ,w
-                # need to soup
-                # if obj_index == 1:
-                #     _boss_GT_err_ADD_df_list[obj_index].loc[_GT_panda_step] = [_GT_panda_step, _record_t - _record_t_begin, pw_T_obj_opti_pos[0], pw_T_obj_opti_pos[1], pw_T_obj_opti_pos[2], pw_T_obj_opti_ori[0], pw_T_obj_opti_ori[1], pw_T_obj_opti_ori[2], pw_T_obj_opti_ori[3], 'GT', obj, scene, PARTICLE_NUM, VERSION, obj_name+'2', MASS_marker, FRICTION_marker]
-                #     _boss_obse_err_ADD_df_list[obj_index].loc[_obse_panda_step] = [_obse_panda_step, _record_t - _record_t_begin, pw_T_obj_obse_pos[0], pw_T_obj_obse_pos[1], pw_T_obj_obse_pos[2], pw_T_obj_obse_ori[0], pw_T_obj_obse_ori[1], pw_T_obj_obse_ori[2], pw_T_obj_obse_ori[3], 'DOPE', obj, scene, PARTICLE_NUM, VERSION, obj_name+'2', MASS_marker, FRICTION_marker]      
-                # else:
                 _boss_GT_err_ADD_df_list[obj_index].loc[_GT_panda_step] = [_GT_panda_step, _record_t - _record_t_begin, pw_T_obj_opti_pos[0], pw_T_obj_opti_pos[1], pw_T_obj_opti_pos[2], pw_T_obj_opti_ori[0], pw_T_obj_opti_ori[1], pw_T_obj_opti_ori[2], pw_T_obj_opti_ori[3], 'GT', obj, scene, PARTICLE_NUM, VERSION, obj_name, MASS_marker, FRICTION_marker]
-                _boss_obse_err_ADD_df_list[obj_index].loc[_obse_panda_step] = [_obse_panda_step, _record_t - _record_t_begin, pw_T_obj_obse_pos[0], pw_T_obj_obse_pos[1], pw_T_obj_obse_pos[2], pw_T_obj_obse_ori[0], pw_T_obj_obse_ori[1], pw_T_obj_obse_ori[2], pw_T_obj_obse_ori[3], 'DOPE', obj, scene, PARTICLE_NUM, VERSION, obj_name, MASS_marker, FRICTION_marker]      
+                _boss_obse_err_ADD_df_list[obj_index].loc[_obse_panda_step] = [_obse_panda_step, _record_t - _record_t_begin, pw_T_obj_obse_pos[0], pw_T_obj_obse_pos[1], pw_T_obj_obse_pos[2], pw_T_obj_obse_ori[0], pw_T_obj_obse_ori[1], pw_T_obj_obse_ori[2], pw_T_obj_obse_ori[3], 'OBSE', obj, scene, PARTICLE_NUM, VERSION, obj_name, MASS_marker, FRICTION_marker]      
 
                 opti_object = Object_Pose(obj_name, pw_T_obj_obse_id, pw_T_obj_opti_pos, pw_T_obj_opti_ori, index=obj_index)
                 temp_pw_T_obj_opti_objs_list.append(opti_object)
@@ -1980,10 +1972,6 @@ if __name__ == '__main__':
                 break    
         t_end_while = time.time()
 
-        
-    par_length = len(p_par_env_list)
-    for i in range(par_length):
-        p_par_env_list[i].disconnect()
 
 
 
