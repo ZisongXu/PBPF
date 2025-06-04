@@ -259,7 +259,9 @@ The above steps cover the entire process of running the code, but to ensure it r
  
 	
 
+## 🧬 Use Different Physics Simulation Engines
 
+1. We provide a base class interface in `./PBPF/home/catkin_ws/src/PBPF/scripts/PhysicsEnv.py` and a subclass implementation in `./PBPF/home/catkin_ws/src/PBPF/scripts/PyBulletEnv`.py. If you wish to use a different physics simulation engine (such as [MuJoCo](https://mujoco.org/) or [IsaacSim](https://docs.omniverse.nvidia.com/isaacsim/latest/installation/index.html)), you can create a new subclass that inherits from `./PBPF/home/catkin_ws/src/PBPF/scripts/PhysicsEnv.py` and implement the corresponding functions as needed.
 
 
  
