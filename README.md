@@ -32,7 +32,7 @@ This is the official implementation of the paper, Tracking and Control of Multip
 ```bibtex
 @article{PBPF2025,
   title={Tracking and Control of Multiple Objects during Non-Prehensile Manipulation in Clutter},
-  author={Zisong Xu, Rafael Papallas$, Jaina Modisett$, Markus Billeter, and Mehmet R. Dogar},
+  author={Zisong Xu, Rafael Papallas, Jaina Modisett, Markus Billeter, and Mehmet R. Dogar},
   journal={IEEE Transactions on Robotics},
   year={2025},
   publisher={IEEE}
