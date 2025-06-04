@@ -37,7 +37,6 @@ This is the official implementation of the paper, Tracking and Control of Multip
   year={2025},
   publisher={IEEE}
 }
-}
 ```
 
 
