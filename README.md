@@ -24,6 +24,24 @@ This is the official implementation of the paper, Tracking and Control of Multip
 
 **Abstract:** We propose a method for 6D pose tracking and control of multiple objects during non-prehensile manipulation by a robot. The tracking system estimates objects' poses by integrating physics predictions, derived from robotic joint state information, with visual inputs from an RGB-D camera. Specifically, the methodology is based on particle filtering, which fuses control information from the robot as an input for each particle movement and with real-time camera observations to track the pose of objects. Comparative analyses reveal that this physics-based approach substantially improves pose tracking accuracy over baseline methods that rely solely on visual data, particularly during manipulation in clutter, where occlusions are a frequent problem. The tracking system is integrated with a model predictive control approach which shows that the probabilistic nature of our tracking system can help robust manipulation planning and control of multiple objects in clutter, even under heavy occlusions.
 
+
+
+<br>
+
+# 📖 Bibtex
+```bibtex
+@article{PBPF2025,
+  title={Tracking and Control of Multiple Objects during Non-Prehensile Manipulation in Clutter},
+  author={Zisong Xu, Rafael Papallas$, Jaina Modisett$, Markus Billeter, and Mehmet R. Dogar},
+  journal={IEEE Transactions on Robotics},
+  year={2025},
+  publisher={IEEE}
+}
+}
+```
+
+
+
 <br>
 
 # 🎥 Supplementary Video:
