@@ -255,7 +255,7 @@ The above steps cover the entire process of running the code, but to ensure it r
 
 2. **Update the Physical Simulation Environment**
 
-	Modify the environment configuration (6D poses only) in `./PBPF/home/catkin_ws/src/PBPF/scripts/Create_Scene.py`, and then modify the physics simulation environment in `./PBPF/home/catkin_ws/src/PBPF/scripts/SingleENV.py`.
+	Modify the environment configuration (6D poses only) in `./PBPF/home/catkin_ws/src/PBPF/scripts/Create_Scene.py`, and then modify the physics simulation environment in `./PBPF/home/catkin_ws/src/PBPF/scripts/PyBulletEnv.py`.
  
 	
 
