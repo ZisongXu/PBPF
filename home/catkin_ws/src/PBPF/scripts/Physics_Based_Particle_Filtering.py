@@ -1565,6 +1565,12 @@ if __name__ == '__main__':
                 axs[0, par_index].imshow(vk_rendered_depth_image_array_list[par_index], cmap="gray")
                 axs[1, par_index].imshow(vk_rendered__mask_image_array_list[par_index], cmap="gray")
             plt.show()
+            # temp_seg_img = copy.deepcopy(vk_rendered__mask_image_array_list[par_index])
+            # temp_seg_img[temp_seg_img>100] = 0
+            # temp_seg_img[temp_seg_img==1] = 20
+            # plt.imshow(temp_seg_img)
+            # plt.show()
+            # plt.imsave('seg.png', temp_seg_img)
     # ============================================================================
 
     print("Welcome to Our Approach ! RUNNING MODEL: ", RUNNING_MODEL)

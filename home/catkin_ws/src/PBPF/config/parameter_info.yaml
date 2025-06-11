@@ -221,7 +221,7 @@ otob_name_list:
 - cracker_obstacle
 - fish_can
 panda_robot_link_number: 11
-particle_num: 50
+particle_num: 1
 persp_to_ortho_flag: false
 pf_update_frequency:
   CVPF: 0.025
