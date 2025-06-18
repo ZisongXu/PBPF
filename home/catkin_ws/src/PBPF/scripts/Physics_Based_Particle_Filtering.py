@@ -329,13 +329,32 @@ def compute_transformation_matrix(a_pos, a_ori, b_pos, b_ori):
     # ow_T_b_4_4 = rotation_4_4_to_transformation_4_4(ow_T_b_3_3,b_pos)
     # a_T_ow_4_4 = np.linalg.inv(ow_T_a_4_4)
     # a_T_b_4_4 = np.dot(a_T_ow_4_4,ow_T_b_4_4)
-    ow_T_a_3_3 = np.array(p.getMatrixFromQuaternion(a_ori)).reshape(3, 3)
-    ow_T_a_3_4 = np.c_[ow_T_a_3_3, a_pos]  # Add position to create 3x4 matrix
+
+
+    ow_T_a_pos = [a_pos[0], a_pos[1], a_pos[2]]
+    ow_T_a_ori = [a_ori[0], a_ori[1], a_ori[2], a_ori[3]] # x,y,z,w
+    ow_T_a_ori_anti = [a_ori[3], a_ori[0], a_ori[1], a_ori[2]] # w,x,y,z
+    tmp_q = Quaternion(ow_T_a_ori_anti)
+    ow_T_a_3_3 = tmp_q.rotation_matrix
+    ow_T_a_3_4 = np.c_[ow_T_a_3_3, ow_T_a_pos]  # Add position to create 3x4 matrix
     ow_T_a_4_4 = np.r_[ow_T_a_3_4, [[0, 0, 0, 1]]]  # Convert to 4x4 homogeneous matrix
 
-    ow_T_b_3_3 = np.array(p.getMatrixFromQuaternion(b_ori)).reshape(3, 3)
-    ow_T_b_3_4 = np.c_[ow_T_b_3_3, b_pos]  # Add position to create 3x4 matrix
+    ow_T_b_pos = [b_pos[0], b_pos[1], b_pos[2]]
+    ow_T_b_ori = [b_ori[0], b_ori[1], b_ori[2], b_ori[3]] # x,y,z,w
+    ow_T_b_ori_anti = [b_ori[3], b_ori[0], b_ori[1], b_ori[2]] # w,x,y,z
+    tmp_q = Quaternion(ow_T_b_ori_anti)
+    ow_T_b_3_3 = tmp_q.rotation_matrix
+    ow_T_b_3_4 = np.c_[ow_T_b_3_3, ow_T_b_pos]  # Add position to create 3x4 matrix
     ow_T_b_4_4 = np.r_[ow_T_b_3_4, [[0, 0, 0, 1]]]  # Convert to 4x4 homogeneous matrix
+
+
+    # ow_T_a_3_3 = np.array(p.getMatrixFromQuaternion(a_ori)).reshape(3, 3)
+    # ow_T_a_3_4 = np.c_[ow_T_a_3_3, a_pos]  # Add position to create 3x4 matrix
+    # ow_T_a_4_4 = np.r_[ow_T_a_3_4, [[0, 0, 0, 1]]]  # Convert to 4x4 homogeneous matrix
+
+    # ow_T_b_3_3 = np.array(p.getMatrixFromQuaternion(b_ori)).reshape(3, 3)
+    # ow_T_b_3_4 = np.c_[ow_T_b_3_3, b_pos]  # Add position to create 3x4 matrix
+    # ow_T_b_4_4 = np.r_[ow_T_b_3_4, [[0, 0, 0, 1]]]  # Convert to 4x4 homogeneous matrix
 
     a_T_ow_4_4 = np.linalg.inv(ow_T_a_4_4)
     a_T_b_4_4 = np.dot(a_T_ow_4_4,ow_T_b_4_4)
