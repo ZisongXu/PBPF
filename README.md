@@ -34,6 +34,8 @@ This is the official implementation of the paper, Tracking and Control of Multip
   title={Tracking and Control of Multiple Objects during Non-Prehensile Manipulation in Clutter},
   author={Xu, Zisong and Papallas, Rafael and Modisett, Jaina and Billeter, Markus and Dogar, Mehmet R},
   journal={IEEE Transactions on Robotics},
+  volume={41},
+  pages={3929--3947},
   year={2025},
   publisher={IEEE}
 }
