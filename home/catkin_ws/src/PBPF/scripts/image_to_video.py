@@ -25,8 +25,8 @@ def images_to_video(image_folder, output_video, frame_rate):
     video.release()
  
 # 示例使用
-image_folder = 'track_vis'  # 替换为图像文件夹的路径
-output_video = 'track_vis.mp4'      # 输出视频文件名
+image_folder = 'rgb'  # 替换为图像文件夹的路径
+output_video = 'rgb.mp4'      # 输出视频文件名
 frame_rate = 30                        # 帧率
  
 images_to_video(image_folder, output_video, frame_rate)
